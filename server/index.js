@@ -46,12 +46,14 @@ require('./config/googleOAuth');
 
 // Routes
 app.use('/api/auth', require('./routes/auth'));
-app.use('/auth', require('./routes/auth')); // Google OAuth routes
 app.use('/api/courses', require('./routes/courses'));
 app.use('/api/cart', require('./routes/cart'));
 app.use('/api/orders', require('./routes/orders'));
 app.use('/api/payments', require('./routes/payment')); // Payment routes
 app.use('/api/admin', require('./routes/admin'));
+
+// Google OAuth routes (keep these separate)
+app.use('/auth', require('./routes/auth'));
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
