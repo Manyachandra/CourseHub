@@ -1,0 +1,34 @@
+{
+  "name": "coursehub-website",
+  "version": "1.0.0",
+  "description": "A fully functional course purchase website with Node.js, Next.js, and Express",
+  "main": "server/index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd server && npm run dev",
+    "client": "cd client && npm run dev",
+    "build": "cd client && npm run build",
+    "start": "cd client && npm start",
+    "install-all": "npm install && cd server && npm install && cd ../client && npm install",
+    "setup": "npm run install-all && echo 'Setup complete! Run npm run dev to start both servers.'"
+  },
+  "keywords": [
+    "course",
+    "ecommerce",
+    "nextjs",
+    "express",
+    "nodejs",
+    "mongodb",
+    "education",
+    "learning"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  },
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
+  }
+}
