@@ -5,6 +5,9 @@ import { useUserStore } from '../utils/store';
 import { FiUsers, FiBookOpen, FiShoppingCart, FiTrendingUp, FiPlus, FiEdit2, FiTrash2, FiEye, FiRefreshCw, FiSearch, FiFilter } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
+// API base URL for admin endpoints
+const ADMIN_API_BASE = '/api/admin';
+
 export default function AdminDashboard() {
   const router = useRouter();
   const { user } = useUserStore();
@@ -101,31 +104,31 @@ export default function AdminDashboard() {
         setLoading(false);
       }, 10000);
 
-      const [statsRes, coursesRes, usersRes, ordersRes] = await Promise.all([
-        fetch('http://localhost:5000/api/admin/stats', { credentials: 'include' }),
-        fetch('http://localhost:5000/api/admin/courses', { credentials: 'include' }),
-        fetch('http://localhost:5000/api/admin/users', { credentials: 'include' }),
-        fetch('http://localhost:5000/api/admin/orders', { credentials: 'include' })
+      const [statsResponse, coursesResponse, usersResponse, ordersResponse] = await Promise.all([
+        fetch(`${ADMIN_API_BASE}/stats`, { credentials: 'include' }),
+        fetch(`${ADMIN_API_BASE}/courses`, { credentials: 'include' }),
+        fetch(`${ADMIN_API_BASE}/users`, { credentials: 'include' }),
+        fetch(`${ADMIN_API_BASE}/orders`, { credentials: 'include' })
       ]);
 
       clearTimeout(timeoutId);
 
-      if (!statsRes.ok || !coursesRes.ok || !usersRes.ok || !ordersRes.ok) {
+      if (!statsResponse.ok || !coursesResponse.ok || !usersResponse.ok || !ordersResponse.ok) {
         const errorDetails = {
-          stats: statsRes.status,
-          courses: coursesRes.status,
-          users: usersRes.status,
-          orders: ordersRes.status
+          stats: statsResponse.status,
+          courses: coursesResponse.status,
+          users: usersResponse.status,
+          orders: ordersResponse.status
         };
         console.error('API Response errors:', errorDetails);
         throw new Error(`Failed to fetch admin data: ${JSON.stringify(errorDetails)}`);
       }
 
       const [statsData, coursesData, usersData, ordersData] = await Promise.all([
-        statsRes.json(),
-        coursesRes.json(),
-        usersRes.json(),
-        ordersRes.json()
+        statsResponse.json(),
+        coursesResponse.json(),
+        usersResponse.json(),
+        ordersResponse.json()
       ]);
 
       setStats(statsData);
@@ -173,7 +176,7 @@ export default function AdminDashboard() {
 
     try {
       const promises = selectedCourses.map(courseId =>
-        fetch(`http://localhost:5000/api/admin/courses/${courseId}`, {
+        fetch(`${ADMIN_API_BASE}/courses/${courseId}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -202,7 +205,7 @@ export default function AdminDashboard() {
 
     try {
       const promises = selectedCourses.map(courseId =>
-        fetch(`http://localhost:5000/api/admin/courses/${courseId}`, { 
+        fetch(`${ADMIN_API_BASE}/courses/${courseId}`, { 
           method: 'DELETE',
           credentials: 'include'
         })
@@ -226,7 +229,7 @@ export default function AdminDashboard() {
     }
 
     try {
-      const response = await fetch('http://localhost:5000/api/admin/courses', {
+      const response = await fetch(`${ADMIN_API_BASE}/courses`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -259,7 +262,7 @@ export default function AdminDashboard() {
 
   const handleUpdateOrderStatus = async (orderId, status) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/admin/orders/${orderId}/status`, {
+      const response = await fetch(`${ADMIN_API_BASE}/orders/${orderId}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -292,7 +295,7 @@ export default function AdminDashboard() {
     if (!courseToDelete) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/api/admin/courses/${courseToDelete._id}`, {
+      const response = await fetch(`${ADMIN_API_BASE}/courses/${courseToDelete._id}`, {
         method: 'DELETE',
         credentials: 'include'
       });
@@ -313,7 +316,7 @@ export default function AdminDashboard() {
   const handleToggleCourseStatus = async (courseId, currentStatus) => {
     try {
       const newStatus = currentStatus === 'published' ? 'draft' : 'published';
-      const response = await fetch(`http://localhost:5000/api/admin/courses/${courseId}/toggle-status`, {
+      const response = await fetch(`${ADMIN_API_BASE}/courses/${courseId}/toggle-status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -334,8 +337,8 @@ export default function AdminDashboard() {
   const handleSaveCourse = async (courseData) => {
     try {
       const url = courseData._id 
-        ? `http://localhost:5000/api/admin/courses/${courseData._id}`
-        : 'http://localhost:5000/api/admin/courses';
+        ? `${ADMIN_API_BASE}/courses/${courseData._id}`
+        : `${ADMIN_API_BASE}/courses`;
       
       const method = courseData._id ? 'PUT' : 'POST';
       
