@@ -22,10 +22,6 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Session configuration
-//Session Management: Uses express-session with MongoDB storage (connect-mongo)
-//security: httpOnly: true prevents XSS attacks, secure: true in production for HTTPS
-//TTL: 24-hour session timeout with automatic cleanup
-//CORS: Configured for frontend communication with credentials support
 app.use(session({
   secret: process.env.SESSION_SECRET || 'your-secret-key',
   resave: false,
@@ -73,7 +69,13 @@ app.use('*', (req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-});
+// For Vercel deployment, export the app
+module.exports = app;
+
+// Only listen if not in Vercel environment
+if (process.env.NODE_ENV !== 'production' || process.env.VERCEL !== '1') {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  });
+}
