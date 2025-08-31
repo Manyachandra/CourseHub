@@ -83,7 +83,7 @@ export default function CourseDetails() {
   if (loading) {
     return (
       <div className={`min-h-screen transition-colors duration-200 ${theme && theme === 'dark' ? 'dark' : ''}`}>
-        <Layout>
+        
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="animate-pulse">
               <div className="h-8 bg-gray-300 dark:bg-gray-600 rounded w-1/3 mb-4"></div>
@@ -101,7 +101,7 @@ export default function CourseDetails() {
               </div>
             </div>
           </div>
-        </Layout>
+        
       </div>
     );
   }
@@ -109,7 +109,7 @@ export default function CourseDetails() {
   if (!course) {
     return (
       <div className={`min-h-screen transition-colors duration-200 ${theme === 'dark' ? 'dark' : ''}`}>
-        <Layout>
+        
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Course Not Found</h1>
             <p className="text-gray-600 dark:text-white mb-6">
@@ -122,14 +122,14 @@ export default function CourseDetails() {
               Browse All Courses
             </button>
           </div>
-        </Layout>
+        
       </div>
     );
   }
 
   return (
     <div className={`min-h-screen transition-colors duration-200 ${theme && theme === 'dark' ? 'dark' : ''}`}>
-      <Layout>
+      
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             {/* Course Header */}
@@ -455,7 +455,7 @@ export default function CourseDetails() {
             </div>
           </div>
         </div>
-      </Layout>
+      
     </div>
   );
 }

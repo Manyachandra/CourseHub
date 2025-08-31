@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import Layout from '../components/Layout';
 import { useThemeStore } from '../utils/store';
 import { FiSearch, FiMessageCircle, FiMail, FiPhone, FiClock, FiHelpCircle, FiChevronDown, FiChevronUp } from 'react-icons/fi';
 
@@ -62,7 +61,7 @@ export default function Help() {
 
   return (
     <div className={`min-h-screen transition-colors duration-200 ${theme === 'dark' ? 'dark' : ''}`}>
-      <Layout>
+      
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
           {/* Hero Section */}
           <section className="bg-gradient-to-r from-primary-600 to-primary-800 text-white py-20">
@@ -253,7 +252,7 @@ export default function Help() {
             </div>
           </section>
         </div>
-      </Layout>
+      
     </div>
   );
 }

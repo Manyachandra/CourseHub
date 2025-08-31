@@ -3,7 +3,6 @@ import { useRouter } from 'next/router';
 import { paymentAPI } from '../utils/api';
 import { useThemeStore } from '../utils/store';
 import toast from 'react-hot-toast';
-import Layout from '../components/Layout';
 
 export default function TestPayment() {
   const router = useRouter();
@@ -131,7 +130,7 @@ export default function TestPayment() {
 
   return (
     <div className={`min-h-screen transition-colors duration-200 ${theme === 'dark' ? 'dark' : ''}`}>
-      <Layout>
+      
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             {/* Header */}
@@ -331,7 +330,7 @@ export default function TestPayment() {
             </div>
           </div>
         </div>
-      </Layout>
+      
     </div>
   );
 }

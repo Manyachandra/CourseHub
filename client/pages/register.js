@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import Layout from '../components/Layout';
 import { authAPI } from '../utils/api';
 import { useUserStore, useThemeStore } from '../utils/store';
 import { FiUser, FiMail, FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
@@ -108,7 +107,7 @@ export default function Register() {
 
   return (
     <div className={`min-h-screen transition-colors duration-200 ${theme && theme === 'dark' ? 'dark' : ''}`}>
-      <Layout>
+      
         <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
           <div className="max-w-md w-full space-y-8">
             {/* Header */}
@@ -323,7 +322,7 @@ export default function Register() {
             </div>
           </div>
         </div>
-      </Layout>
+      
     </div>
   );
 }

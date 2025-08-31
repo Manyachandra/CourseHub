@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import Link from 'next/link';
-import Layout from '../components/Layout';
 import { useThemeStore } from '../utils/store';
 import { FiMail, FiCheckCircle, FiArrowLeft } from 'react-icons/fi';
 import toast from 'react-hot-toast';
@@ -42,7 +41,7 @@ export default function ForgotPassword() {
   if (submitted) {
     return (
       <div className={`min-h-screen transition-colors duration-200 ${theme === 'dark' ? 'dark' : ''}`}>
-        <Layout>
+        
           <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center py-12">
             <div className="max-w-md w-full text-center">
               <div className="w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -66,14 +65,14 @@ export default function ForgotPassword() {
               </div>
             </div>
           </div>
-        </Layout>
+        
       </div>
     );
   }
 
   return (
     <div className={`min-h-screen transition-colors duration-200 ${theme === 'dark' ? 'dark' : ''}`}>
-      <Layout>
+      
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
           <div className="max-w-md w-full space-y-8">
             {/* Header */}
@@ -144,7 +143,7 @@ export default function ForgotPassword() {
             </div>
           </div>
         </div>
-      </Layout>
+      
     </div>
   );
 }

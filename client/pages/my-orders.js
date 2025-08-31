@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import Layout from '../components/Layout';
 import { useUserStore, useThemeStore } from '../utils/store';
 import { ordersAPI } from '../utils/api';
 import { FiPackage, FiCalendar, FiDollarSign, FiCheckCircle, FiClock, FiXCircle } from 'react-icons/fi';
@@ -69,14 +68,14 @@ export default function MyOrders() {
   if (!user) {
     return (
       <div className={`min-h-screen transition-colors duration-200 ${theme === 'dark' ? 'dark' : ''}`}>
-        <Layout>
+        
           <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
               <p className="text-gray-600 dark:text-white">Loading orders...</p>
             </div>
           </div>
-        </Layout>
+        
       </div>
     );
   }
@@ -84,7 +83,7 @@ export default function MyOrders() {
   if (loading) {
     return (
       <div className={`min-h-screen transition-colors duration-200 ${theme === 'dark' ? 'dark' : ''}`}>
-        <Layout>
+        
           <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="animate-pulse">
@@ -103,14 +102,14 @@ export default function MyOrders() {
               </div>
             </div>
           </div>
-        </Layout>
+        
       </div>
     );
   }
 
   return (
     <div className={`min-h-screen transition-colors duration-200 ${theme === 'dark' ? 'dark' : ''}`}>
-      <Layout>
+      
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             {/* Header */}
@@ -239,7 +238,7 @@ export default function MyOrders() {
             )}
           </div>
         </div>
-      </Layout>
+      
     </div>
   );
 }

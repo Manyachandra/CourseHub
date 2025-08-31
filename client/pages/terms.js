@@ -1,4 +1,3 @@
-import Layout from '../components/Layout';
 import { useThemeStore } from '../utils/store';
 import { FiFileText, FiCheckCircle, FiAlertTriangle } from 'react-icons/fi';
 
@@ -7,7 +6,7 @@ export default function Terms() {
 
   return (
     <div className={`min-h-screen transition-colors duration-200 ${theme && theme === 'dark' ? 'dark' : ''}`}>
-      <Layout>
+      
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
           {/* Hero Section */}
           <section className="bg-gradient-to-r from-primary-600 to-primary-800 text-white py-20">
@@ -265,7 +264,7 @@ export default function Terms() {
             </div>
           </section>
         </div>
-      </Layout>
+      
     </div>
   );
 }

@@ -21,14 +21,14 @@ export default function Checkout() {
   if (!items) {
     return (
       <div className={`min-h-screen transition-colors duration-200 ${theme === 'dark' ? 'dark' : ''}`}>
-        <Layout>
+        
           <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
               <p className="text-gray-600 dark:text-white">Loading cart...</p>
             </div>
           </div>
-        </Layout>
+        
       </div>
     );
   }
@@ -63,14 +63,14 @@ export default function Checkout() {
   if (!mounted) {
     return (
       <div className={`min-h-screen transition-colors duration-200 ${theme === 'dark' ? 'dark' : ''}`}>
-        <Layout>
+        
           <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
               <p className="text-gray-600 dark:text-white">Loading checkout...</p>
             </div>
           </div>
-        </Layout>
+        
       </div>
     );
   }
@@ -175,7 +175,7 @@ export default function Checkout() {
   if (items.length === 0) {
     return (
       <div className={`min-h-screen transition-colors duration-200 ${theme === 'dark' ? 'dark' : ''}`}>
-        <Layout>
+        
           <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
             <div className="text-center">
               <FiShoppingCart className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
@@ -191,14 +191,14 @@ export default function Checkout() {
               </button>
             </div>
           </div>
-        </Layout>
+        
       </div>
     );
   }
 
   return (
     <div className={`min-h-screen transition-colors duration-200 ${theme === 'dark' ? 'dark' : ''}`}>
-      <Layout>
+      
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             {/* Header */}
@@ -538,7 +538,7 @@ export default function Checkout() {
             </div>
           </div>
         </div>
-      </Layout>
+      
     </div>
   );
 }

@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import Layout from '../components/Layout';
 import { useThemeStore } from '../utils/store';
 import { FiSearch, FiChevronDown, FiChevronUp, FiHelpCircle, FiBookOpen, FiCreditCard, FiShield, FiUsers } from 'react-icons/fi';
 
@@ -142,7 +141,7 @@ export default function FAQ() {
 
   return (
     <div className={`min-h-screen transition-colors duration-200 ${theme === 'dark' ? 'dark' : ''}`}>
-      <Layout>
+      
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             {/* Header */}
@@ -261,7 +260,7 @@ export default function FAQ() {
             </div>
           </div>
         </div>
-      </Layout>
+      
     </div>
   );
 }
