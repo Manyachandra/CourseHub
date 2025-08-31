@@ -75,6 +75,29 @@ export const useUserStore = create(
         }
       },
       
+      // Function to refresh user data (including purchased courses)
+      refreshUserData: async () => {
+        try {
+          const currentUser = get().user;
+          if (!currentUser?.token) return false;
+          
+          const response = await authAPI.getCurrentUser();
+          if (response.data.user) {
+            const userWithToken = { ...response.data.user, token: currentUser.token };
+            set({ user: userWithToken });
+            console.log('=== USER DATA REFRESHED ===');
+            console.log('Updated user data:', userWithToken);
+            console.log('Updated purchased courses:', userWithToken.purchasedCourses);
+            console.log('==========================');
+            return true;
+          }
+          return false;
+        } catch (error) {
+          console.error('Error refreshing user data:', error);
+          return false;
+        }
+      },
+      
       // Function to check authentication status
       isAuthenticated: () => !!get().user,
     }),
@@ -153,24 +176,45 @@ export const useCartStore = create(
             throw new Error('Authentication token not found');
           }
           
-          // Check if course is already purchased
-          const userPurchasedCourses = state?.user?.purchasedCourses || [];
-          console.log('=== CART ADD DEBUG ===');
-          console.log('Course ID:', course._id);
-          console.log('User purchased courses:', userPurchasedCourses);
-          console.log('Checking purchase status...');
-          
-          const isAlreadyPurchased = userPurchasedCourses.some(item => {
-            const matches = item.courseId === course._id || item.courseId._id === course._id;
-            console.log('Item:', item, 'Matches:', matches);
-            return matches;
-          });
-          
-          console.log('Is already purchased:', isAlreadyPurchased);
-          console.log('========================');
-          
-          if (isAlreadyPurchased) {
-            throw new Error('Course already purchased');
+          // First, try to get fresh user data from the backend
+          try {
+            const userResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/auth/me`, {
+              headers: {
+                'Authorization': `Bearer ${token}`,
+              },
+            });
+            
+            if (userResponse.ok) {
+              const userData = await userResponse.json();
+              console.log('=== FRESH USER DATA ===');
+              console.log('Fresh user data:', userData);
+              console.log('Fresh purchased courses:', userData.purchasedCourses);
+              console.log('========================');
+              
+              // Check if course is already purchased using fresh data
+              const freshPurchasedCourses = userData.purchasedCourses || [];
+              const isAlreadyPurchased = freshPurchasedCourses.some(item => {
+                const matches = item.courseId === course._id || item.courseId._id === course._id;
+                console.log('Fresh check - Item:', item, 'Matches:', matches);
+                return matches;
+              });
+              
+              if (isAlreadyPurchased) {
+                throw new Error('Course already purchased');
+              }
+            }
+          } catch (userError) {
+            console.log('Could not fetch fresh user data, using local storage:', userError);
+            // Fallback to local storage check
+            const userPurchasedCourses = state?.user?.purchasedCourses || [];
+            const isAlreadyPurchased = userPurchasedCourses.some(item => {
+              const matches = item.courseId === course._id || item.courseId._id === course._id;
+              return matches;
+            });
+            
+            if (isAlreadyPurchased) {
+              throw new Error('Course already purchased');
+            }
           }
           
           // Add to backend first
@@ -192,7 +236,20 @@ export const useCartStore = create(
               set({ items: [...items, { courseId: course, addedAt: new Date(), quantity: 1 }] });
             }
           } else {
-            throw new Error(`Failed to add to cart: ${response.status}`);
+            const errorData = await response.json().catch(() => ({}));
+            console.log('=== CART ADD ERROR ===');
+            console.log('Response status:', response.status);
+            console.log('Error data:', errorData);
+            console.log('========================');
+            
+            // Handle specific error cases
+            if (response.status === 400 && errorData.message) {
+              if (errorData.message.includes('already purchased') || errorData.message.includes('already owns')) {
+                throw new Error('Course already purchased');
+              }
+            }
+            
+            throw new Error(errorData.message || `Failed to add to cart: ${response.status}`);
           }
         } catch (error) {
           console.error('Error adding to cart:', error);
