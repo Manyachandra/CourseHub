@@ -1,4 +1,19 @@
 const User = require('../models/User');
+const jwt = require('jsonwebtoken');
+
+// Generate JWT token
+const generateToken = (user) => {
+  return jwt.sign(
+    { 
+      id: user._id, 
+      email: user.email, 
+      role: user.role,
+      name: user.name 
+    },
+    process.env.JWT_SECRET || 'your-jwt-secret',
+    { expiresIn: '24h' }
+  );
+};
 
 // User registration
 const register = async (req, res) => {
@@ -20,33 +35,23 @@ const register = async (req, res) => {
 
     await user.save();
 
-    // Set session
-    req.session.userId = user._id;
-    req.session.userRole = user.role;
-    req.session.userName = user.name;
+    // Generate JWT token
+    const token = generateToken(user);
 
-    // Force session save
-    req.session.save((err) => {
-      if (err) {
-        console.error('Session save error:', err);
-        return res.status(500).json({ message: 'Session creation failed' });
-      }
-      
-      console.log('Session created successfully:', {
-        sessionID: req.sessionID,
-        userId: req.session.userId,
-        userRole: req.session.userRole
-      });
+    console.log('User registered successfully:', {
+      userId: user._id,
+      userRole: user.role
+    });
 
-      res.status(201).json({
-        message: 'User registered successfully',
-        user: {
-          id: user._id,
-          name: user.name,
-          email: user.email,
-          role: user.role
-        }
-      });
+    res.status(201).json({
+      message: 'User registered successfully',
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+      },
+      token
     });
   } catch (error) {
     console.error('Registration error:', error);
@@ -71,33 +76,23 @@ const login = async (req, res) => {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    // Set session
-    req.session.userId = user._id;
-    req.session.userRole = user.role;
-    req.session.userName = user.name;
-    
-    // Force session save
-    req.session.save((err) => {
-      if (err) {
-        console.error('Session save error:', err);
-        return res.status(500).json({ message: 'Session creation failed' });
-      }
-      
-      console.log('Session created successfully:', {
-        sessionID: req.sessionID,
-        userId: req.session.userId,
-        userRole: req.session.userRole
-      });
+    // Generate JWT token
+    const token = generateToken(user);
 
-      res.json({
-        message: 'Login successful',
-        user: {
-          id: user._id,
-          name: user.name,
-          email: user.email,
-          role: user.role
-        }
-      });
+    console.log('User logged in successfully:', {
+      userId: user._id,
+      userRole: user.role
+    });
+
+    res.json({
+      message: 'Login successful',
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+      },
+      token
     });
   } catch (error) {
     console.error('Login error:', error);
@@ -105,21 +100,16 @@ const login = async (req, res) => {
   }
 };
 
-// User logout
+// User logout (client-side token removal)
 const logout = (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
-      return res.status(500).json({ message: 'Error during logout' });
-    }
-    res.clearCookie('connect.sid');
-    res.json({ message: 'Logout successful' });
-  });
+  res.json({ message: 'Logout successful' });
 };
 
 // Get current user
 const getCurrentUser = async (req, res) => {
   try {
-    const user = await User.findById(req.session.userId).select('-password');
+    // User is already attached to req by JWT middleware
+    const user = await User.findById(req.user.id).select('-password');
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }

@@ -13,15 +13,30 @@ console.log('================================');
 // Create axios instance with default config
 const api = axios.create({
   baseURL: API_BASE_URL,
-  withCredentials: true,
+  withCredentials: false, // No need for cookies with JWT
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Add request interceptor to log all API calls
+// Add request interceptor to add JWT token
 api.interceptors.request.use(
   (config) => {
+    // Get token from localStorage
+    if (typeof window !== 'undefined') {
+      const userStorage = localStorage.getItem('user-storage');
+      if (userStorage) {
+        try {
+          const { state } = JSON.parse(userStorage);
+          if (state.user && state.user.token) {
+            config.headers.Authorization = `Bearer ${state.user.token}`;
+          }
+        } catch (error) {
+          console.error('Error parsing user storage:', error);
+        }
+      }
+    }
+
     console.log('=== API REQUEST ===');
     console.log('Method:', config.method?.toUpperCase());
     console.log('URL:', config.baseURL + config.url);
