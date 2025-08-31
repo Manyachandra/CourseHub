@@ -7,7 +7,7 @@ import ThemeToggle from './ThemeToggle';
 export default function Layout({ children }) {
   const router = useRouter();
   const { user, logout } = useUserStore();
-  const { cartItems = [], clearCart } = useCartStore();
+  const { items: cartItems = [], clearCart, syncCart } = useCartStore();
   const { theme, setTheme } = useThemeStore();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -27,6 +27,13 @@ export default function Layout({ children }) {
       }
     }
   }, [setTheme]);
+
+  // Sync cart with backend when user is authenticated
+  useEffect(() => {
+    if (user && typeof window !== 'undefined') {
+      syncCart();
+    }
+  }, [user, syncCart]);
 
   const handleLogout = async () => {
     try {

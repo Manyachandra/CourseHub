@@ -97,23 +97,110 @@ export const useCartStore = create(
       setTotal: (total) => set({ total }),
       setLoading: (isLoading) => set({ isLoading }),
       
-      addItem: (course) => {
-        const { items } = get();
-        const existingItem = items.find(item => item.courseId._id === course._id);
-        
-        if (!existingItem) {
-          set({ items: [...items, { courseId: course, addedAt: new Date() }] });
+      // Sync cart with backend
+      syncCart: async () => {
+        try {
+          set({ isLoading: true });
+          const response = await fetch('/api/cart');
+          if (response.ok) {
+            const data = await response.json();
+            set({ items: data.cart || [] });
+          }
+        } catch (error) {
+          console.error('Error syncing cart:', error);
+        } finally {
+          set({ isLoading: false });
         }
       },
       
-      removeItem: (courseId) => {
+      addItem: async (course) => {
+        try {
+          // Add to backend first
+          const response = await fetch('/api/cart/add', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ courseId: course._id }),
+          });
+          
+          if (response.ok) {
+            // Then update local store
+            const { items } = get();
+            const existingItem = items.find(item => item.courseId._id === course._id);
+            
+            if (!existingItem) {
+              set({ items: [...items, { courseId: course, addedAt: new Date(), quantity: 1 }] });
+            }
+          }
+        } catch (error) {
+          console.error('Error adding to cart:', error);
+        }
+      },
+      
+      removeItem: async (courseId) => {
+        try {
+          // Remove from backend first
+          const response = await fetch(`/api/cart/remove/${courseId}`, {
+            method: 'DELETE',
+          });
+          
+          if (response.ok) {
+            // Then update local store
+            const { items } = get();
+            set({ items: items.filter(item => item.courseId._id !== courseId) });
+          }
+        } catch (error) {
+          console.error('Error removing from cart:', error);
+        }
+      },
+      
+      updateQuantity: (courseId, quantity) => {
+        const { items } = get();
+        set({ 
+          items: items.map(item => 
+            item.courseId._id === courseId 
+              ? { ...item, quantity: Math.max(1, quantity) }
+              : item
+          )
+        });
+      },
+      
+      clearCart: async () => {
+        try {
+          // Clear from backend first
+          const response = await fetch('/api/cart/clear', {
+            method: 'DELETE',
+          });
+          
+          if (response.ok) {
+            // Then clear local store
+            set({ items: [], total: 0 });
+          }
+        } catch (error) {
+          console.error('Error clearing cart:', error);
+        }
+      },
+      
+      updateTotal: (total) => set({ total }),
+      
+      // Check if course is already in cart
+      isInCart: (courseId) => {
+        const { items } = get();
+        return items.some(item => item.courseId._id === courseId);
+      },
+      
+      // Remove course from cart after purchase
+      removeAfterPurchase: (courseId) => {
         const { items } = get();
         set({ items: items.filter(item => item.courseId._id !== courseId) });
       },
       
-      clearCart: () => set({ items: [], total: 0 }),
-      
-      updateTotal: (total) => set({ total }),
+      // Check if course is already purchased (to be called from other components)
+      isCoursePurchased: (courseId, userPurchasedCourses) => {
+        if (!userPurchasedCourses) return false;
+        return userPurchasedCourses.some(item => item.courseId === courseId);
+      },
     }),
     {
       name: 'cart-storage',

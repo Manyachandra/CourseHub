@@ -52,12 +52,11 @@ export default function CourseDetails() {
     }
 
     try {
-      await cartAPI.add(id);
-      addItem(course);
+      await addItem(course);
       toast.success('Course added to cart!');
     } catch (error) {
       console.error('Error adding to cart:', error);
-      toast.error(error.response?.data?.message || 'Error adding to cart');
+      toast.error('Error adding to cart');
     }
   };
 

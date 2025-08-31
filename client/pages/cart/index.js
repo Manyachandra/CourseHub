@@ -8,12 +8,17 @@ import toast from 'react-hot-toast';
 
 export default function Cart() {
   const router = useRouter();
-  const { cartItems = [], removeFromCart, updateQuantity, clearCart } = useCartStore();
+  const { items: cartItems = [], removeFromCart, updateQuantity, clearCart, syncCart } = useCartStore();
   const { theme } = useThemeStore();
   const [loading, setLoading] = useState(false);
 
   // Ensure cartItems is always an array to prevent SSR errors
   const safeCartItems = Array.isArray(cartItems) ? cartItems : [];
+
+  // Sync cart with backend on component mount
+  useEffect(() => {
+    syncCart();
+  }, [syncCart]);
 
   const calculateTotal = () => {
     return safeCartItems.reduce((total, item) => total + (item.courseId.price * item.quantity), 0);
