@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import Layout from '../../components/Layout';
+
 import { useThemeStore } from '../../utils/store';
 import { coursesAPI, cartAPI } from '../../utils/api';
 import { useUserStore, useCartStore } from '../../utils/store';
@@ -24,7 +24,9 @@ export default function CourseDetails() {
   const [showReviewForm, setShowReviewForm] = useState(false);
 
   const isInCart = items.some(item => item.courseId._id === id);
-  const isPurchased = user?.purchasedCourses?.some(item => item.courseId === id);
+  const isPurchased = user?.purchasedCourses?.some(item => 
+    item.courseId === id || item.courseId._id === id
+  );
 
   useEffect(() => {
     if (id) {
@@ -49,6 +51,11 @@ export default function CourseDetails() {
     if (!isAuthenticated()) {
       toast.error('Please login to add courses to cart');
       router.push('/login');
+      return;
+    }
+
+    if (isPurchased) {
+      toast.error('You already own this course!');
       return;
     }
 

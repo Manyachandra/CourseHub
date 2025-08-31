@@ -19,11 +19,31 @@ const api = axios.create({
   },
 });
 
-// Add request interceptor to add JWT token
+// Add request interceptor to add JWT token only for protected endpoints
 api.interceptors.request.use(
   (config) => {
-    // Get token from localStorage
-    if (typeof window !== 'undefined') {
+    // Only add JWT token for protected endpoints
+    const protectedEndpoints = [
+      '/auth/me',
+      '/auth/profile', 
+      '/auth/purchased-courses',
+      '/cart',
+      '/cart/add',
+      '/cart/remove',
+      '/cart/clear',
+      '/orders',
+      '/admin'
+    ];
+    
+    // Special case for course reviews
+    const isReviewEndpoint = config.url.includes('/reviews');
+    
+    const isProtected = protectedEndpoints.some(endpoint => {
+      return config.url.startsWith(endpoint);
+    }) || isReviewEndpoint;
+    
+    // Get token from localStorage only for protected endpoints
+    if (isProtected && typeof window !== 'undefined') {
       const userStorage = localStorage.getItem('user-storage');
       if (userStorage) {
         try {
@@ -40,6 +60,7 @@ api.interceptors.request.use(
     console.log('=== API REQUEST ===');
     console.log('Method:', config.method?.toUpperCase());
     console.log('URL:', config.baseURL + config.url);
+    console.log('Protected endpoint:', isProtected);
     console.log('With credentials:', config.withCredentials);
     console.log('Headers:', config.headers);
     console.log('==================');
