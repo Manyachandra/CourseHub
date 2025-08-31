@@ -9,7 +9,7 @@ import Pagination from '../../components/Pagination';
 
 export default function Cart() {
   const router = useRouter();
-  const { items: cartItems = [], removeFromCart, updateQuantity, clearCart, syncCart } = useCartStore();
+  const { items: cartItems = [], removeItem, updateQuantity, clearCart, syncCart } = useCartStore();
   const { theme } = useThemeStore();
   const { user, isAuthenticated } = useUserStore();
   const [loading, setLoading] = useState(false);
@@ -95,7 +95,7 @@ export default function Cart() {
 
   const handleRemoveItem = async (itemId) => {
     try {
-      await removeFromCart(itemId);
+      await removeItem(itemId);
       toast.success('Item removed from cart');
     } catch (error) {
       toast.error('Error removing item from cart');
