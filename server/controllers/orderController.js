@@ -165,10 +165,61 @@ const updateOrderStatus = async (req, res) => {
   }
 };
 
+// Process payment for an order
+const processPayment = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const { paymentMethod, paymentDetails } = req.body;
+
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    // Check if user can access this order
+    if (order.user.toString() !== req.user.id) {
+      return res.status(403).json({ message: 'Access denied' });
+    }
+
+    // Mock payment processing (in real app, integrate with Stripe/PayPal)
+    order.paymentStatus = 'completed';
+    order.status = 'completed';
+    order.paymentDetails = {
+      paymentId: `pay_${Date.now()}`,
+      transactionId: `txn_${Date.now()}`,
+      processedAt: new Date(),
+      method: paymentMethod,
+      ...paymentDetails
+    };
+
+    await order.save();
+
+    // Add courses to user's purchased courses
+    const user = await User.findById(req.user.id);
+    order.courses.forEach(courseItem => {
+      user.purchasedCourses.push({
+        courseId: courseItem.course,
+        purchasedAt: new Date()
+      });
+    });
+
+    await user.save();
+
+    res.json({
+      message: 'Payment processed successfully',
+      order
+    });
+  } catch (error) {
+    console.error('Process payment error:', error);
+    res.status(500).json({ message: 'Server error while processing payment' });
+  }
+};
+
 module.exports = {
   createOrder,
   getOrderById,
   getUserOrders,
   getAllOrders,
-  updateOrderStatus
+  updateOrderStatus,
+  processPayment
 };
