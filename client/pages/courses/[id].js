@@ -11,7 +11,7 @@ export default function CourseDetails() {
   const router = useRouter();
   const { id } = router.query;
   const { theme } = useThemeStore();
-  const { user, isAuthenticated, refreshUserData } = useUserStore();
+  const { user, isAuthenticated } = useUserStore();
   const { addItem, items } = useCartStore();
   
   const [course, setCourse] = useState(null);
@@ -43,12 +43,7 @@ export default function CourseDetails() {
     }
   }, [id]);
 
-  // Refresh user data to get latest purchase information
-  useEffect(() => {
-    if (isAuthenticated() && user) {
-      refreshUserData();
-    }
-  }, [isAuthenticated, user, refreshUserData]);
+
 
   const fetchCourse = async () => {
     try {
