@@ -3,8 +3,11 @@ import axios from 'axios';
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
 
 // Debug logging
+console.log('=== API CONFIGURATION DEBUG ===');
 console.log('API_BASE_URL:', API_BASE_URL);
 console.log('NEXT_PUBLIC_API_URL env var:', process.env.NEXT_PUBLIC_API_URL);
+console.log('Current window location:', typeof window !== 'undefined' ? window.location.href : 'Server side');
+console.log('================================');
 
 // Create axios instance with default config
 const api = axios.create({
@@ -15,12 +18,19 @@ const api = axios.create({
   },
 });
 
-// Request interceptor
+// Add request interceptor to log all API calls
 api.interceptors.request.use(
   (config) => {
+    console.log('=== API REQUEST ===');
+    console.log('Method:', config.method?.toUpperCase());
+    console.log('URL:', config.baseURL + config.url);
+    console.log('With credentials:', config.withCredentials);
+    console.log('Headers:', config.headers);
+    console.log('==================');
     return config;
   },
   (error) => {
+    console.error('API Request Error:', error);
     return Promise.reject(error);
   }
 );
