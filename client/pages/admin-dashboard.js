@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Layout from '../components/Layout';
 import { useUserStore } from '../utils/store';
+import { adminAPI } from '../utils/api';
 import { FiUsers, FiBookOpen, FiShoppingCart, FiTrendingUp, FiPlus, FiEdit2, FiTrash2, FiEye, FiRefreshCw, FiSearch, FiFilter } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
@@ -115,31 +116,32 @@ export default function AdminDashboard() {
       }, 10000);
 
       const [statsRes, coursesRes, usersRes, ordersRes] = await Promise.all([
-        fetch('/api/admin/stats', { credentials: 'include' }),
-        fetch('/api/admin/courses', { credentials: 'include' }),
-        fetch('/api/admin/users', { credentials: 'include' }),
-        fetch('/api/admin/orders', { credentials: 'include' })
+        adminAPI.getStats(),
+        adminAPI.getAllCourses(),
+        adminAPI.getAllUsers(),
+        adminAPI.getAllOrders()
       ]);
 
       clearTimeout(timeoutId);
 
-      if (!statsRes.ok || !coursesRes.ok || !usersRes.ok || !ordersRes.ok) {
+      // Check if any response has an error
+      if (statsRes.data?.error || coursesRes.data?.error || usersRes.data?.error || ordersRes.data?.error) {
         const errorDetails = {
-          stats: statsRes.status,
-          courses: coursesRes.status,
-          users: usersRes.status,
-          orders: ordersRes.status
+          stats: statsRes.data?.error ? 'error' : 'ok',
+          courses: coursesRes.data?.error ? 'error' : 'ok',
+          users: usersRes.data?.error ? 'error' : 'ok',
+          orders: ordersRes.data?.error ? 'error' : 'ok'
         };
         console.error('API Response errors:', errorDetails);
         throw new Error(`Failed to fetch admin data: ${JSON.stringify(errorDetails)}`);
       }
 
-      const [statsData, coursesData, usersData, ordersData] = await Promise.all([
-        statsRes.json(),
-        coursesRes.json(),
-        usersRes.json(),
-        ordersRes.json()
-      ]);
+      const [statsData, coursesData, usersData, ordersData] = [
+        statsRes.data,
+        coursesRes.data,
+        usersRes.data,
+        ordersRes.data
+      ];
 
       setStats(statsData);
       setCourses(coursesData);
@@ -186,12 +188,7 @@ export default function AdminDashboard() {
 
     try {
       const promises = selectedCourses.map(courseId =>
-        fetch(`/api/admin/courses/${courseId}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ status: 'published' })
-        })
+        adminAPI.toggleCourseStatus(courseId, 'published')
       );
 
       await Promise.all(promises);
@@ -215,10 +212,7 @@ export default function AdminDashboard() {
 
     try {
       const promises = selectedCourses.map(courseId =>
-        fetch(`/api/admin/courses/${courseId}`, { 
-          method: 'DELETE',
-          credentials: 'include'
-        })
+        adminAPI.deleteCourse(courseId)
       );
 
       await Promise.all(promises);
@@ -239,14 +233,9 @@ export default function AdminDashboard() {
     }
 
     try {
-      const response = await fetch('/api/admin/courses', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(newCourse)
-      });
+      const response = await adminAPI.createCourse(newCourse);
 
-      if (!response.ok) {
+      if (response.data?.error) {
         throw new Error('Failed to create course');
       }
 
@@ -272,14 +261,9 @@ export default function AdminDashboard() {
 
   const handleUpdateOrderStatus = async (orderId, status) => {
     try {
-      const response = await fetch(`/api/admin/orders/${orderId}/status`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ status })
-      });
+      const response = await adminAPI.updateOrderStatus(orderId, status);
 
-      if (!response.ok) {
+      if (response.data?.error) {
         throw new Error('Failed to update order status');
       }
 
@@ -305,12 +289,9 @@ export default function AdminDashboard() {
     if (!courseToDelete) return;
 
     try {
-      const response = await fetch(`/api/admin/courses/${courseToDelete._id}`, {
-        method: 'DELETE',
-        credentials: 'include'
-      });
+      const response = await adminAPI.deleteCourse(courseToDelete._id);
 
-      if (!response.ok) {
+      if (response.data?.error) {
         throw new Error('Failed to delete course');
       }
 
@@ -326,14 +307,9 @@ export default function AdminDashboard() {
   const handleToggleCourseStatus = async (courseId, currentStatus) => {
     try {
       const newStatus = currentStatus === 'published' ? 'draft' : 'published';
-      const response = await fetch(`/api/admin/courses/${courseId}/toggle-status`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ status: newStatus })
-      });
+      const response = await adminAPI.toggleCourseStatus(courseId, newStatus);
 
-      if (!response.ok) {
+      if (response.data?.error) {
         throw new Error('Failed to update course status');
       }
 
@@ -346,20 +322,14 @@ export default function AdminDashboard() {
 
   const handleSaveCourse = async (courseData) => {
     try {
-      const url = courseData._id 
-        ? `/api/admin/courses/${courseData._id}`
-        : '/api/admin/courses';
-      
-      const method = courseData._id ? 'PUT' : 'POST';
-      
-      const response = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(courseData)
-      });
+      let response;
+      if (courseData._id) {
+        response = await adminAPI.updateCourse(courseData._id, courseData);
+      } else {
+        response = await adminAPI.createCourse(courseData);
+      }
 
-      if (!response.ok) {
+      if (response.data?.error) {
         throw new Error('Failed to save course');
       }
 
