@@ -28,6 +28,15 @@ export default function CourseDetails() {
     item.courseId === id || item.courseId._id === id
   );
 
+  // Debug logging
+  console.log('=== COURSE DETAIL DEBUG ===');
+  console.log('Course ID:', id);
+  console.log('User:', user);
+  console.log('User purchased courses:', user?.purchasedCourses);
+  console.log('Is in cart:', isInCart);
+  console.log('Is purchased:', isPurchased);
+  console.log('==========================');
+
   useEffect(() => {
     if (id) {
       fetchCourse();

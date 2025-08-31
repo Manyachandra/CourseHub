@@ -116,7 +116,7 @@ export const useCartStore = create(
             return;
           }
           
-          const response = await fetch('/cart', {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/cart`, {
             headers: {
               'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json',
@@ -150,7 +150,7 @@ export const useCartStore = create(
           if (!token) return;
           
           // Add to backend first
-          const response = await fetch('/cart/add', {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/cart/add`, {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -185,7 +185,7 @@ export const useCartStore = create(
           if (!token) return;
           
           // Remove from backend first
-          const response = await fetch(`/cart/remove/${courseId}`, {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/cart/remove/${courseId}`, {
             method: 'DELETE',
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -231,7 +231,7 @@ export const useCartStore = create(
           if (!token) return;
           
           // Clear from backend first
-          const response = await fetch('/cart/clear', {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/cart/clear`, {
             method: 'DELETE',
             headers: {
               'Authorization': `Bearer ${token}`,
