@@ -50,8 +50,8 @@ export default function Courses() {
     if (filters.price) {
       if (filters.price === 'free' && course.price > 0) return false;
       if (filters.price === 'paid' && course.price === 0) return false;
-      if (filters.price === 'under500' && course.price >= 500) return false;
-      if (filters.price === 'over500' && course.price < 500) return false;
+      if (filters.price === 'under50' && course.price >= 50) return false;
+      if (filters.price === 'over50' && course.price < 50) return false;
     }
     if (filters.search && !course.title.toLowerCase().includes(filters.search.toLowerCase())) return false;
     return true;
@@ -177,8 +177,8 @@ export default function Courses() {
                 <option value="">All Prices</option>
                 <option value="free">Free</option>
                 <option value="paid">Paid</option>
-                <option value="under500">Under ₹500</option>
-                <option value="over500">Over ₹500</option>
+                <option value="under50">Under $50</option>
+                <option value="over50">Over $50</option>
               </select>
             </div>
 
@@ -236,7 +236,7 @@ export default function Courses() {
                   />
                   <div className="absolute top-4 right-4">
                     <span className="badge-primary px-3 py-1 rounded-full text-sm font-medium">
-                      {course.price === 0 ? 'Free' : `₹${course.price}`}
+                      {course.price === 0 ? 'Free' : `$${course.price}`}
                     </span>
                   </div>
                 </div>

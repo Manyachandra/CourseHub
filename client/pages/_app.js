@@ -45,7 +45,7 @@ export default function App({ Component, pageProps }) {
   // Prevent hydration mismatch by not rendering theme-dependent content until mounted
   if (!mounted) {
     return (
-      <>
+      <Layout>
         <Component {...pageProps} />
         <Toaster
           position="top-right"
@@ -58,12 +58,12 @@ export default function App({ Component, pageProps }) {
             },
           }}
         />
-      </>
+      </Layout>
     );
   }
 
   return (
-    <>
+    <Layout>
       <Component {...pageProps} />
       <Toaster
         position="top-right"
@@ -76,6 +76,6 @@ export default function App({ Component, pageProps }) {
           },
         }}
       />
-    </>
+    </Layout>
   );
 }

@@ -97,7 +97,7 @@ export default function Layout({ children }) {
               {/* Cart */}
               <Link href="/cart" className="relative p-2 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200" title="Shopping Cart">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m6 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                 </svg>
                 {safeCartItems.length > 0 && (
                   <span className="absolute -top-1 -right-1 bg-primary-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
@@ -194,7 +194,7 @@ export default function Layout({ children }) {
               >
                 <div className="flex items-center space-x-2">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m6 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                   </svg>
                   <span>Shopping Cart</span>
                   {safeCartItems.length > 0 && (
@@ -280,7 +280,7 @@ export default function Layout({ children }) {
                 <span className="text-xl font-bold text-gray-900 dark:text-white">CourseHub</span>
               </div>
               <p className="text-gray-600 dark:text-gray-300 mb-4">
-                Your gateway to knowledge and skill development through high-quality online courses. Based in India, serving learners worldwide.
+                Your gateway to knowledge and skill development through high-quality online courses.
               </p>
             </div>
 
@@ -337,7 +337,7 @@ export default function Layout({ children }) {
           <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
             <div className="flex flex-col md:flex-row justify-between items-center">
               <div className="text-gray-600 dark:text-gray-300 text-sm">
-                © 2024 CourseHub. All rights reserved. | Made in India 🇮🇳
+                © 2024 CourseHub. All rights reserved.
               </div>
               <div className="flex space-x-6 mt-4 md:mt-0">
                 <Link href="/privacy" className="text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 text-sm transition-colors duration-200">
