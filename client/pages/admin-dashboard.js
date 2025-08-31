@@ -426,8 +426,7 @@ export default function AdminDashboard() {
 
   return (
     <div className={`min-h-screen transition-colors duration-200 ${theme === 'dark' ? 'dark' : ''}`}>
-      
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         {/* Header */}
         <div className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -454,11 +453,10 @@ export default function AdminDashboard() {
             </div>
           </div>
         </div>
-        </div>
 
         {/* Tabs */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="border-b border-gray-200 dark:border-gray-700 mb-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="border-b border-gray-200 dark:border-gray-700 mb-6">
             <nav className="-mb-px flex space-x-8">
               {[
                 { id: 'overview', label: 'Overview', icon: FiTrendingUp },
@@ -487,7 +485,7 @@ export default function AdminDashboard() {
 
           {/* Tab Content */}
           {activeTab === 'overview' && (
-            <div className="space-y-8">
+            <div className="space-y-6">
               {/* Quick Stats Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
@@ -1317,7 +1315,7 @@ export default function AdminDashboard() {
             <FiPlus className="w-6 h-6" />
           </button>
         </div>
-      
+      </div>
     </div>
   );
 }
