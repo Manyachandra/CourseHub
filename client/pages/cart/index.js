@@ -8,12 +8,15 @@ import toast from 'react-hot-toast';
 
 export default function Cart() {
   const router = useRouter();
-  const { cartItems, removeFromCart, updateQuantity, clearCart } = useCartStore();
+  const { cartItems = [], removeFromCart, updateQuantity, clearCart } = useCartStore();
   const { theme } = useThemeStore();
   const [loading, setLoading] = useState(false);
 
+  // Ensure cartItems is always an array to prevent SSR errors
+  const safeCartItems = Array.isArray(cartItems) ? cartItems : [];
+
   const calculateTotal = () => {
-    return cartItems.reduce((total, item) => total + (item.courseId.price * item.quantity), 0);
+    return safeCartItems.reduce((total, item) => total + (item.courseId.price * item.quantity), 0);
   };
 
   const handleQuantityChange = (itemId, newQuantity) => {
@@ -32,14 +35,14 @@ export default function Cart() {
   };
 
   const handleCheckout = () => {
-    if (cartItems.length === 0) {
+    if (safeCartItems.length === 0) {
       toast.error('Your cart is empty');
       return;
     }
     router.push('/checkout');
   };
 
-  if (cartItems.length === 0) {
+  if (safeCartItems.length === 0) {
     return (
       <div className={`min-h-screen transition-colors duration-200 ${theme === 'dark' ? 'dark' : ''}`}>
         <Head>
@@ -87,7 +90,7 @@ export default function Cart() {
             Shopping Cart
           </h1>
           <p className="text-gray-600 dark:text-gray-300">
-            {cartItems.length} {cartItems.length === 1 ? 'course' : 'courses'} in your cart
+            {safeCartItems.length} {safeCartItems.length === 1 ? 'course' : 'courses'} in your cart
           </p>
         </div>
 
@@ -110,7 +113,7 @@ export default function Cart() {
               </div>
 
               <div className="divide-y divide-gray-200 dark:divide-gray-700">
-                {cartItems.map((item) => (
+                {safeCartItems.map((item) => (
                   <div key={item.id} className="p-6">
                     <div className="flex items-start space-x-4">
                       {/* Course Image */}
@@ -191,7 +194,7 @@ export default function Cart() {
               <div className="p-6 space-y-4">
                 {/* Subtotal */}
                 <div className="flex justify-between text-gray-600 dark:text-gray-300">
-                  <span>Subtotal ({cartItems.length} {cartItems.length === 1 ? 'course' : 'courses'})</span>
+                  <span>Subtotal ({safeCartItems.length} {safeCartItems.length === 1 ? 'course' : 'courses'})</span>
                   <span>${calculateTotal().toFixed(2)}</span>
                 </div>
 
@@ -210,7 +213,7 @@ export default function Cart() {
                 {/* Checkout Button */}
                 <button
                   onClick={handleCheckout}
-                  disabled={loading || cartItems.length === 0}
+                  disabled={loading || safeCartItems.length === 0}
                   className="btn-primary w-full py-3 text-lg font-semibold rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? 'Processing...' : 'Proceed to Checkout'}
