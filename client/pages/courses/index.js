@@ -3,6 +3,7 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { coursesAPI } from '../../utils/api';
 import { useThemeStore } from '../../utils/store';
+import Pagination from '../../components/Pagination';
 
 export default function Courses() {
   const [courses, setCourses] = useState([]);
@@ -16,6 +17,7 @@ export default function Courses() {
   });
   const [categories, setCategories] = useState([]);
   const [levels, setLevels] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
   const { theme } = useThemeStore();
 
   useEffect(() => {
@@ -56,6 +58,24 @@ export default function Courses() {
     if (filters.search && !course.title.toLowerCase().includes(filters.search.toLowerCase())) return false;
     return true;
   });
+
+  // Pagination logic
+  const itemsPerPage = 12;
+  const totalPages = Math.ceil(filteredCourses.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentCourses = filteredCourses.slice(startIndex, endIndex);
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filters]);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    // Scroll to top when page changes
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const handleFilterChange = (key, value) => {
     setFilters(prev => ({ ...prev, [key]: value }));
@@ -226,7 +246,7 @@ export default function Courses() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredCourses.map((course) => (
+            {currentCourses.map((course) => (
               <div key={course._id} className="course-card rounded-xl overflow-hidden transition-all duration-200">
                 <div className="relative">
                   <img
@@ -273,6 +293,19 @@ export default function Courses() {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Pagination */}
+        {!loading && filteredCourses.length > 0 && (
+          <div className="mt-8">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+              totalItems={filteredCourses.length}
+              itemsPerPage={itemsPerPage}
+            />
           </div>
         )}
       </div>

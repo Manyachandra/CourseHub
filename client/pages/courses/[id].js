@@ -21,6 +21,7 @@ export default function CourseDetails() {
     rating: 5,
     comment: ''
   });
+  const [showReviewForm, setShowReviewForm] = useState(false);
 
   const isInCart = items.some(item => item.courseId._id === id);
   const isPurchased = user?.purchasedCourses?.some(item => item.courseId === id);
@@ -447,6 +448,121 @@ export default function CourseDetails() {
                           </p>
                         </div>
                       </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Reviews Section */}
+              <div className="mt-12">
+                <div className="card">
+                  <div className="p-6">
+                    <div className="flex items-center justify-between mb-6">
+                      <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                        Reviews ({course.reviews?.length || 0})
+                      </h3>
+                      {isAuthenticated() && !isPurchased && (
+                        <button
+                          onClick={() => setShowReviewForm(!showReviewForm)}
+                          className="btn btn-outline"
+                        >
+                          Write a Review
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Review Form */}
+                    {showReviewForm && isAuthenticated() && (
+                      <form onSubmit={handleReviewSubmit} className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                        <div className="mb-4">
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Rating
+                          </label>
+                          <div className="flex items-center space-x-2">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <button
+                                key={star}
+                                type="button"
+                                onClick={() => setReviewForm({ ...reviewForm, rating: star })}
+                                className={`text-2xl ${
+                                  star <= reviewForm.rating
+                                    ? 'text-yellow-500'
+                                    : 'text-gray-300 dark:text-gray-600'
+                                }`}
+                              >
+                                ★
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="mb-4">
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Comment
+                          </label>
+                          <textarea
+                            value={reviewForm.comment}
+                            onChange={(e) => setReviewForm({ ...reviewForm, comment: e.target.value })}
+                            rows={3}
+                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                            placeholder="Share your thoughts about this course..."
+                            required
+                          />
+                        </div>
+                        <div className="flex justify-end space-x-3">
+                          <button
+                            type="button"
+                            onClick={() => setShowReviewForm(false)}
+                            className="btn btn-outline"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            type="submit"
+                            className="btn btn-primary"
+                          >
+                            Submit Review
+                          </button>
+                        </div>
+                      </form>
+                    )}
+
+                    {/* Reviews List */}
+                    <div className="space-y-4">
+                      {course.reviews && course.reviews.length > 0 ? (
+                        course.reviews.map((review, index) => (
+                          <div key={index} className="border-b border-gray-200 dark:border-gray-700 pb-4 last:border-b-0">
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center space-x-2">
+                                <div className="flex items-center">
+                                  {[1, 2, 3, 4, 5].map((star) => (
+                                    <span
+                                      key={star}
+                                      className={`text-sm ${
+                                        star <= review.rating
+                                          ? 'text-yellow-500'
+                                          : 'text-gray-300 dark:text-gray-600'
+                                      }`}
+                                    >
+                                      ★
+                                    </span>
+                                  ))}
+                                </div>
+                                <span className="text-sm text-gray-600 dark:text-gray-400">
+                                  by {review.user?.name || 'Anonymous'}
+                                </span>
+                              </div>
+                              <span className="text-sm text-gray-500 dark:text-gray-400">
+                                {new Date(review.createdAt).toLocaleDateString()}
+                              </span>
+                            </div>
+                            <p className="text-gray-700 dark:text-gray-300">{review.comment}</p>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                          <p>No reviews yet. Be the first to review this course!</p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

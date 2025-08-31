@@ -101,13 +101,38 @@ export const useCartStore = create(
       syncCart: async () => {
         try {
           set({ isLoading: true });
-          const response = await fetch('/api/cart');
+          // Get JWT token from localStorage
+          const userStorage = localStorage.getItem('user-storage');
+          if (!userStorage) {
+            set({ items: [], isLoading: false });
+            return;
+          }
+          
+          const { state } = JSON.parse(userStorage);
+          const token = state?.user?.token;
+          
+          if (!token) {
+            set({ items: [], isLoading: false });
+            return;
+          }
+          
+          const response = await fetch('/api/cart', {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          });
+          
           if (response.ok) {
             const data = await response.json();
             set({ items: data.cart || [] });
+          } else if (response.status === 401) {
+            // Token expired or invalid, clear cart
+            set({ items: [] });
           }
         } catch (error) {
           console.error('Error syncing cart:', error);
+          set({ items: [] });
         } finally {
           set({ isLoading: false });
         }
@@ -115,10 +140,20 @@ export const useCartStore = create(
       
       addItem: async (course) => {
         try {
+          // Get JWT token from localStorage
+          const userStorage = localStorage.getItem('user-storage');
+          if (!userStorage) return;
+          
+          const { state } = JSON.parse(userStorage);
+          const token = state?.user?.token;
+          
+          if (!token) return;
+          
           // Add to backend first
           const response = await fetch('/api/cart/add', {
             method: 'POST',
             headers: {
+              'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({ courseId: course._id }),
@@ -140,9 +175,21 @@ export const useCartStore = create(
       
       removeItem: async (courseId) => {
         try {
+          // Get JWT token from localStorage
+          const userStorage = localStorage.getItem('user-storage');
+          if (!userStorage) return;
+          
+          const { state } = JSON.parse(userStorage);
+          const token = state?.user?.token;
+          
+          if (!token) return;
+          
           // Remove from backend first
           const response = await fetch(`/api/cart/remove/${courseId}`, {
             method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
           });
           
           if (response.ok) {
@@ -155,22 +202,40 @@ export const useCartStore = create(
         }
       },
       
-      updateQuantity: (courseId, quantity) => {
-        const { items } = get();
-        set({ 
-          items: items.map(item => 
-            item.courseId._id === courseId 
-              ? { ...item, quantity: Math.max(1, quantity) }
-              : item
-          )
-        });
+      updateQuantity: async (courseId, quantity) => {
+        try {
+          // Update quantity in backend (if backend supports it)
+          // For now, just update local store
+          const { items } = get();
+          set({ 
+            items: items.map(item => 
+              item.courseId._id === courseId 
+                ? { ...item, quantity: Math.max(1, quantity) }
+                : item
+            )
+          });
+        } catch (error) {
+          console.error('Error updating quantity:', error);
+        }
       },
       
       clearCart: async () => {
         try {
+          // Get JWT token from localStorage
+          const userStorage = localStorage.getItem('user-storage');
+          if (!userStorage) return;
+          
+          const { state } = JSON.parse(userStorage);
+          const token = state?.user?.token;
+          
+          if (!token) return;
+          
           // Clear from backend first
           const response = await fetch('/api/cart/clear', {
             method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
           });
           
           if (response.ok) {

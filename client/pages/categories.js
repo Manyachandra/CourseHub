@@ -5,6 +5,7 @@ import { coursesAPI } from '../utils/api';
 import { FiBookOpen, FiUsers, FiClock, FiStar } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import { useCoursesStore } from '../utils/store';
+import Pagination from '../components/Pagination';
 
 export default function Categories() {
   const { theme } = useThemeStore();
@@ -13,6 +14,7 @@ export default function Categories() {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
 
   const { resetFilters } = useCoursesStore();
 
@@ -57,6 +59,24 @@ export default function Categories() {
       course.description.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesCategory && matchesSearch;
   });
+
+  // Pagination logic
+  const itemsPerPage = 12;
+  const totalPages = Math.ceil(filteredCourses.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentCourses = filteredCourses.slice(startIndex, endIndex);
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory, searchTerm]);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    // Scroll to top when page changes
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const getCategoryStats = (categoryName) => {
     const categoryCourses = courses.filter(course => course.category === categoryName);
@@ -220,7 +240,7 @@ export default function Categories() {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredCourses.map((course) => (
+                  {currentCourses.map((course) => (
                     <div key={course._id} className="course-card rounded-xl overflow-hidden transition-all duration-200">
                       <div className="relative">
                         <img
@@ -279,8 +299,22 @@ export default function Categories() {
                     </div>
                   ))}
                 </div>
+
               )}
             </div>
+
+            {/* Pagination */}
+            {filteredCourses.length > 0 && (
+              <div className="mt-8">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                  totalItems={filteredCourses.length}
+                  itemsPerPage={itemsPerPage}
+                />
+              </div>
+            )}
           </div>
         </div>
     </div>
