@@ -131,6 +131,17 @@ app.get('/api/orders-test', (req, res) => {
   });
 });
 
+// Orders debug route
+app.get('/api/orders-debug', (req, res) => {
+  res.json({
+    message: 'Orders debug endpoint',
+    origin: req.headers.origin,
+    timestamp: new Date().toISOString(),
+    headers: req.headers,
+    user: req.user || 'No user in request'
+  });
+});
+
 // CORS test route
 app.get('/api/cors-test', (req, res) => {
   res.json({

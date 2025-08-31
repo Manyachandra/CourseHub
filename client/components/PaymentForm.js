@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { paymentAPI } from '../utils/api';
+import { useCartStore } from '../utils/store';
 import toast from 'react-hot-toast';
 
 export default function PaymentForm({ order, onPaymentSuccess, onPaymentFailure }) {
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [loading, setLoading] = useState(false);
+  const { clearCart } = useCartStore();
   const [cardDetails, setCardDetails] = useState({
     number: '',
     expiry: '',
@@ -98,9 +100,15 @@ export default function PaymentForm({ order, onPaymentSuccess, onPaymentFailure 
         paymentDetails: paymentMethod === 'card' ? cardDetails : {}
       };
 
+      console.log('Processing payment:', paymentData);
+
       const response = await paymentAPI.process(paymentData);
 
-      if (response.data.success) {
+      if (response.data.message === 'Payment processed successfully') {
+        // Clear cart after successful payment
+        clearCart();
+        console.log('Cart cleared after successful payment');
+        
         toast.success('Payment processed successfully!');
         onPaymentSuccess && onPaymentSuccess(response.data);
       } else {
