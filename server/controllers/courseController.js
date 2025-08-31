@@ -3,6 +3,19 @@ const Course = require('../models/Course');
 // Get all courses with filtering and sorting
 const getCourses = async (req, res) => {
   try {
+    console.log('🔍 getCourses called with query:', req.query);
+    
+    // Check if database is connected
+    if (!req.dbConnected) {
+      console.log('❌ Database not connected');
+      return res.status(503).json({ 
+        message: 'Database connection unavailable',
+        error: 'Service temporarily unavailable. Please try again later.'
+      });
+    }
+    
+    console.log('✅ Database is connected, proceeding with query');
+    
     const {
       category,
       minPrice,
@@ -15,8 +28,9 @@ const getCourses = async (req, res) => {
       limit = 12
     } = req.query;
 
-    // Build filter object
-    const filter = { isPublished: true };
+    // Build filter object - temporarily remove isPublished filter for debugging
+    const filter = {}; // Removed isPublished: true temporarily
+    console.log('🔍 Initial filter:', filter);
     
     if (category) filter.category = category;
     if (level) filter.level = level;
@@ -31,6 +45,8 @@ const getCourses = async (req, res) => {
     if (search) {
       filter.$text = { $search: search };
     }
+    
+    console.log('🔍 Final filter:', filter);
 
     // Build sort object
     let sort = {};
@@ -58,14 +74,32 @@ const getCourses = async (req, res) => {
     const skip = (parseInt(page) - 1) * parseInt(limit);
     
     // Execute query
+    console.log('🔍 Executing database query with filter:', filter);
+    console.log('🔍 Sort:', sort);
+    console.log('🔍 Skip:', skip, 'Limit:', limit);
+    
+    // First, let's try a simple query to see if we can get any courses
+    const allCourses = await Course.find({}).limit(5);
+    console.log('🔍 Simple query test - all courses found:', allCourses.length);
+    if (allCourses.length > 0) {
+      console.log('🔍 Sample course:', {
+        id: allCourses[0]._id,
+        title: allCourses[0].title,
+        isPublished: allCourses[0].isPublished
+      });
+    }
+    
     const courses = await Course.find(filter)
       .sort(sort)
       .skip(skip)
       .limit(parseInt(limit))
       .select('title shortDescription price category instructor rating thumbnail duration level enrollmentCount');
 
+    console.log('✅ Courses found:', courses.length);
+    
     // Get total count for pagination
     const total = await Course.countDocuments(filter);
+    console.log('✅ Total courses count:', total);
 
     res.json({
       courses,
@@ -78,7 +112,39 @@ const getCourses = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Get courses error:', error);
+    console.error('❌ Get courses error:', error);
+    console.error('❌ Error name:', error.name);
+    console.error('❌ Error message:', error.message);
+    console.error('❌ Error stack:', error.stack);
+    
+    // Check if it's a database connection error
+    if (error.name === 'MongoNetworkError' || error.message.includes('connect')) {
+      console.log('❌ Database connection error detected');
+      return res.status(503).json({ 
+        message: 'Database connection error',
+        error: 'Unable to connect to database. Please try again later.'
+      });
+    }
+    
+    // Check if it's a validation error
+    if (error.name === 'ValidationError') {
+      console.log('❌ Validation error detected');
+      return res.status(400).json({ 
+        message: 'Validation error',
+        error: error.message
+      });
+    }
+    
+    // Check if it's a cast error (invalid ObjectId)
+    if (error.name === 'CastError') {
+      console.log('❌ Cast error detected');
+      return res.status(400).json({ 
+        message: 'Invalid data format',
+        error: 'One or more parameters are in invalid format'
+      });
+    }
+    
+    console.log('❌ Generic server error');
     res.status(500).json({ message: 'Server error while fetching courses' });
   }
 };

@@ -6,7 +6,7 @@ export default function About() {
   const { theme } = useThemeStore();
 
   return (
-    <div className={`min-h-screen transition-colors duration-200 ${theme === 'dark' ? 'dark' : ''}`}>
+    <div className={`min-h-screen transition-colors duration-200 ${theme && theme === 'dark' ? 'dark' : ''}`}>
       <Layout>
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
           {/* Hero Section */}

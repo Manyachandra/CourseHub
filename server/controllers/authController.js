@@ -108,6 +108,14 @@ const logout = (req, res) => {
 // Get current user
 const getCurrentUser = async (req, res) => {
   try {
+    // Check if database is connected
+    if (!req.dbConnected) {
+      return res.status(503).json({ 
+        message: 'Database connection unavailable',
+        error: 'Service temporarily unavailable. Please try again later.'
+      });
+    }
+    
     // User is already attached to req by JWT middleware
     const user = await User.findById(req.user.id).select('-password');
     if (!user) {
@@ -116,6 +124,15 @@ const getCurrentUser = async (req, res) => {
     res.json({ user });
   } catch (error) {
     console.error('Get current user error:', error);
+    
+    // Check if it's a database connection error
+    if (error.name === 'MongoNetworkError' || error.message.includes('connect')) {
+      return res.status(503).json({ 
+        message: 'Database connection error',
+        error: 'Unable to connect to database. Please try again later.'
+      });
+    }
+    
     res.status(500).json({ message: 'Server error' });
   }
 };

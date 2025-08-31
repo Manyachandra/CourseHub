@@ -6,13 +6,37 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Connect to MongoDB
-try {
-  connectDB();
-} catch (error) {
-  console.error('Database connection failed:', error);
-  // Continue without database for now
-}
+// Database connection status
+let dbConnected = false;
+
+// Initialize server
+const initializeServer = async () => {
+  // Connect to MongoDB
+  try {
+    await connectDB();
+    dbConnected = true;
+    console.log('✅ Database connected successfully');
+  } catch (error) {
+    console.error('❌ Database connection failed:', error);
+    console.log('⚠️ Server will start but database operations will fail');
+    dbConnected = false;
+  }
+
+  // Start server
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`📊 Database status: ${dbConnected ? 'Connected' : 'Disconnected'}`);
+  });
+};
+
+// Start the server
+initializeServer();
+
+// Database status middleware
+app.use((req, res, next) => {
+  req.dbConnected = dbConnected;
+  next();
+});
 
 // Simple request debugging
 app.use((req, res, next) => {
@@ -20,6 +44,7 @@ app.use((req, res, next) => {
   console.log(`${req.method} ${req.url}`);
   console.log('Origin:', req.headers.origin);
   console.log('Authorization:', req.headers.authorization ? 'Present' : 'None');
+  console.log('Database:', dbConnected ? 'Connected' : 'Disconnected');
   console.log('==================');
   next();
 });
@@ -88,6 +113,11 @@ try {
   console.log('✅ Admin routes file loaded');
   app.use('/api/admin', adminRoutes);
   console.log('✅ Admin routes mounted');
+  
+  const contactRoutes = require('./routes/contact');
+  console.log('✅ Contact routes file loaded');
+  app.use('/api/contact', contactRoutes);
+  console.log('✅ Contact routes mounted');
   
   console.log('🎉 All routes loaded and mounted successfully!');
 } catch (error) {
@@ -169,13 +199,103 @@ app.get('/api/session-test', (req, res) => {
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', timestamp: new Date().toISOString() });
+  res.json({ 
+    status: 'OK', 
+    timestamp: new Date().toISOString(),
+    database: dbConnected ? 'Connected' : 'Disconnected',
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
+
+// Database status endpoint
+app.get('/api/db-status', (req, res) => {
+  res.json({ 
+    connected: dbConnected,
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development',
+    mongodb_uri: process.env.MONGODB_URI ? 'Set' : 'Not Set',
+    jwt_secret: process.env.JWT_SECRET ? 'Set' : 'Not Set'
+  });
+});
+
+// Simple courses test endpoint
+app.get('/api/courses-test', async (req, res) => {
+  try {
+    if (!dbConnected) {
+      return res.status(503).json({ 
+        message: 'Database not connected',
+        connected: false
+      });
+    }
+    
+    // Try to get a simple count
+    const Course = require('./models/Course');
+    const count = await Course.countDocuments({});
+    
+    res.json({
+      message: 'Courses test successful',
+      totalCourses: count,
+      databaseConnected: true,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Courses test error:', error);
+    res.status(500).json({
+      message: 'Courses test failed',
+      error: error.message,
+      databaseConnected: dbConnected
+    });
+  }
+});
+
+// Fallback for database operations when DB is not connected
+app.use('/api/*', (req, res, next) => {
+  if (!dbConnected && req.method !== 'GET' && !req.url.includes('/health') && !req.url.includes('/db-status')) {
+    return res.status(503).json({
+      message: 'Database connection unavailable',
+      error: 'Service temporarily unavailable. Please try again later.',
+      timestamp: new Date().toISOString()
+    });
+  }
+  next();
 });
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ message: 'Something went wrong!' });
+  console.error('❌ Error:', err.message);
+  console.error('Stack:', err.stack);
+  
+  // Check if it's a database connection error
+  if (!req.dbConnected) {
+    return res.status(503).json({ 
+      message: 'Database connection unavailable',
+      error: 'Service temporarily unavailable. Please try again later.',
+      timestamp: new Date().toISOString()
+    });
+  }
+  
+  // Check if it's a JWT error
+  if (err.name === 'JsonWebTokenError') {
+    return res.status(401).json({ 
+      message: 'Invalid token',
+      error: 'Authentication failed'
+    });
+  }
+  
+  // Check if it's a validation error
+  if (err.name === 'ValidationError') {
+    return res.status(400).json({ 
+      message: 'Validation failed',
+      error: err.message
+    });
+  }
+  
+  // Generic error
+  res.status(500).json({ 
+    message: 'Internal server error',
+    error: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong',
+    timestamp: new Date().toISOString()
+  });
 });
 
 // 404 handler

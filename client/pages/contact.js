@@ -29,15 +29,28 @@ export default function Contact() {
 
     try {
       setLoading(true);
-      // In a real app, this would send the form data to your backend
-      // For now, we'll simulate a successful submission
-      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      setSubmitted(true);
-      setFormData({ name: '', email: '', subject: '', message: '' });
-      toast.success('Message sent successfully! We\'ll get back to you soon.');
+      // Send form data to backend API
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        setSubmitted(true);
+        setFormData({ name: '', email: '', subject: '', message: '' });
+        toast.success('Message sent successfully! We\'ll get back to you soon.');
+      } else {
+        throw new Error(result.error || 'Failed to send message');
+      }
     } catch (error) {
-      toast.error('Failed to send message. Please try again.');
+      console.error('Contact form error:', error);
+      toast.error(error.message || 'Failed to send message. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -54,21 +67,21 @@ export default function Contact() {
     {
       icon: <FiPhone className="w-6 h-6" />,
       title: "Call Us",
-      details: "+1 (800) COURSE",
+      details: "+91 (800) COURSE",
       action: "Call Now",
-      href: "tel:+1-800-COURSE"
+      href: "tel:+91-800-COURSE"
     },
     {
       icon: <FiMapPin className="w-6 h-6" />,
       title: "Visit Us",
-      details: "123 Learning Street, Education City, EC 12345",
+      details: "123 Learning Street, Bangalore, Karnataka 560001, India",
       action: "Get Directions",
       href: "#"
     },
     {
       icon: <FiClock className="w-6 h-6" />,
       title: "Business Hours",
-      details: "Mon-Fri: 9AM-6PM EST",
+      details: "Mon-Fri: 9AM-6PM IST",
       action: "View Schedule",
       href: "/help"
     }
@@ -101,7 +114,7 @@ export default function Contact() {
   }
 
   return (
-    <div className={`min-h-screen transition-colors duration-200 ${theme === 'dark' ? 'dark' : ''}`}>
+    <div className={`min-h-screen transition-colors duration-200 ${theme && theme === 'dark' ? 'dark' : ''}`}>
       <Layout>
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -272,7 +285,7 @@ export default function Contact() {
                       Do you offer refunds?
                     </h3>
                     <p className="text-gray-600 dark:text-white">
-                      We offer a 30-day money-back guarantee for all course purchases.
+                      We offer a 30-day money-back guarantee for all course purchases. Refunds are processed in Indian Rupees (₹).
                     </p>
                   </div>
                 </div>
