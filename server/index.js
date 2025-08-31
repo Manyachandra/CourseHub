@@ -33,7 +33,9 @@ app.use((req, res, next) => {
   console.log('Origin:', req.headers.origin);
   console.log('Cookie header:', req.headers.cookie);
   console.log('Session ID:', req.sessionID);
+  console.log('Session name:', req.session?.name);
   console.log('User in session:', req.session?.user);
+  console.log('Session cookie:', req.session?.cookie);
   console.log('==================');
   next();
 });
@@ -57,7 +59,8 @@ app.use(session({
     sameSite: 'none', // Allow cross-site cookies
     // Remove domain restriction to allow cross-origin cookies
     path: '/'
-  }
+  },
+  name: 'coursehub.sid' // Custom session name
 }));
 
 // Initialize Passport and restore authentication state

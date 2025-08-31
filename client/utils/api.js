@@ -48,8 +48,8 @@ api.interceptors.response.use(
       // Clear any stored user data on authentication failure
       if (typeof window !== 'undefined') {
         localStorage.removeItem('user-storage');
-        // Optionally redirect to login
-        // window.location.href = '/login';
+        // Don't redirect automatically to prevent loops
+        // Let components handle this based on their needs
       }
     }
     return Promise.reject(error);

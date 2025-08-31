@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { authAPI } from './api';
 
 // User store
 export const useUserStore = create(
@@ -10,12 +11,40 @@ export const useUserStore = create(
       
       setUser: (user) => set({ user }),
       setLoading: (isLoading) => set({ isLoading }),
-      logout: () => set({ user: null }),
+      
+      logout: async () => {
+        try {
+          await authAPI.logout();
+        } catch (error) {
+          console.error('Logout error:', error);
+        } finally {
+          set({ user: null });
+        }
+      },
       
       updateUser: (updates) => {
         const { user } = get();
         if (user) {
           set({ user: { ...user, ...updates } });
+        }
+      },
+      
+      // Function to check authentication status with backend
+      checkAuth: async () => {
+        try {
+          set({ isLoading: true });
+          const response = await authAPI.getCurrentUser();
+          if (response.data.user) {
+            set({ user: response.data.user });
+            return true;
+          }
+          return false;
+        } catch (error) {
+          console.error('Auth check error:', error);
+          set({ user: null });
+          return false;
+        } finally {
+          set({ isLoading: false });
         }
       },
       

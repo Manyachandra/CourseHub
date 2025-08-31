@@ -35,7 +35,7 @@ router.get('/logout', (req, res) => {
       if (err) {
         return res.status(500).json({ message: 'Error destroying session' });
       }
-      res.clearCookie('connect.sid');
+      res.clearCookie('coursehub.sid');
       res.json({ message: 'Logged out successfully' });
     });
   });
