@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import Layout from '../components/Layout';
+import { useThemeStore } from '../utils/store';
 import { FiMail, FiPhone, FiMapPin, FiClock, FiSend, FiCheckCircle } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
 export default function Contact() {
+  const { theme } = useThemeStore();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -74,201 +76,222 @@ export default function Contact() {
 
   if (submitted) {
     return (
-      <Layout>
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12">
-          <div className="max-w-md w-full text-center">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <FiCheckCircle className="w-8 h-8 text-green-600" />
+      <div className={`min-h-screen transition-colors duration-200 ${theme === 'dark' ? 'dark' : ''}`}>
+        <Layout>
+          <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center py-12">
+            <div className="max-w-md w-full text-center">
+              <div className="w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-6">
+                <FiCheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Message Sent Successfully!</h2>
+              <p className="text-gray-600 dark:text-white mb-8">
+                Thank you for contacting us. We'll get back to you within 24 hours.
+              </p>
+              <button
+                onClick={() => setSubmitted(false)}
+                className="btn btn-primary"
+              >
+                Send Another Message
+              </button>
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Message Sent Successfully!</h2>
-            <p className="text-gray-600 mb-8">
-              Thank you for contacting us. We'll get back to you within 24 hours.
-            </p>
-            <button
-              onClick={() => setSubmitted(false)}
-              className="btn btn-primary"
-            >
-              Send Another Message
-            </button>
           </div>
-        </div>
-      </Layout>
+        </Layout>
+      </div>
     );
   }
 
   return (
-    <Layout>
-      <div className="min-h-screen bg-gray-50">
-        {/* Hero Section */}
-        <section className="bg-gradient-to-r from-primary-600 to-primary-800 text-white py-20">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">Contact Us</h1>
-            <p className="text-xl md:text-2xl text-primary-100 max-w-3xl mx-auto">
-              Get in touch with our team. We're here to help and answer your questions.
-            </p>
-          </div>
-        </section>
-
-        {/* Contact Information */}
-        <section className="py-16 bg-white">
+    <div className={`min-h-screen transition-colors duration-200 ${theme === 'dark' ? 'dark' : ''}`}>
+      <Layout>
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">Get in Touch</h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {contactInfo.map((info, index) => (
-                <div key={index} className="text-center p-6 bg-gray-50 rounded-lg">
-                  <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    {info.icon}
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{info.title}</h3>
-                  <p className="text-gray-600 mb-4 text-sm">{info.details}</p>
-                  <a 
-                    href={info.href}
-                    className="inline-block text-primary-600 hover:text-primary-700 font-medium"
-                  >
-                    {info.action}
-                  </a>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Contact Form */}
-        <section className="py-16 bg-gray-50">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="bg-white rounded-lg shadow-lg p-8">
-              <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold text-gray-900 mb-4">Send us a Message</h2>
-                <p className="text-gray-600">
-                  Fill out the form below and we'll get back to you as soon as possible.
-                </p>
-              </div>
-
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                      Full Name *
-                    </label>
-                    <input
-                      id="name"
-                      type="text"
-                      value={formData.name}
-                      onChange={(e) => handleChange('name', e.target.value)}
-                      required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                      placeholder="Enter your full name"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                      Email Address *
-                    </label>
-                    <input
-                      id="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => handleChange('email', e.target.value)}
-                      required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                      placeholder="Enter your email address"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
-                    Subject
-                  </label>
-                  <input
-                    id="subject"
-                    type="text"
-                    value={formData.subject}
-                    onChange={(e) => handleChange('subject', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    placeholder="What is this about?"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
-                    Message *
-                  </label>
-                  <textarea
-                    id="message"
-                    rows={6}
-                    value={formData.message}
-                    onChange={(e) => handleChange('message', e.target.value)}
-                    required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
-                    placeholder="Tell us how we can help you..."
-                  />
-                </div>
-
-                <div className="text-center">
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="btn btn-primary px-8 py-3 text-lg flex items-center mx-auto disabled:opacity-50"
-                  >
-                    <FiSend className="w-5 h-5 mr-2" />
-                    {loading ? 'Sending...' : 'Send Message'}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </section>
-
-        {/* FAQ Preview */}
-        <section className="py-16 bg-white">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Frequently Asked Questions</h2>
-            <p className="text-gray-600 mb-8">
-              Find quick answers to common questions in our help center.
-            </p>
-            <a href="/help" className="btn btn-outline px-8 py-3 text-lg">
-              Visit Help Center
-            </a>
-          </div>
-        </section>
-
-        {/* Office Location */}
-        <section className="py-16 bg-gray-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            {/* Header */}
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">Our Office</h2>
-              <p className="text-gray-600">
-                Visit us at our headquarters in Education City
+              <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Contact Us</h1>
+              <p className="text-xl text-gray-600 dark:text-white max-w-3xl mx-auto">
+                Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.
               </p>
             </div>
-            
-            <div className="bg-white rounded-lg shadow-lg p-8">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+              {/* Contact Form */}
+              <div className="card">
+                <div className="p-8">
+                  <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6">Send us a message</h2>
+                  
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-white mb-2">
+                          Full Name *
+                        </label>
+                        <input
+                          type="text"
+                          id="name"
+                          name="name"
+                          required
+                          value={formData.name}
+                          onChange={(e) => handleChange('name', e.target.value)}
+                          className="input w-full"
+                          placeholder="Your full name"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-white mb-2">
+                          Email Address *
+                        </label>
+                        <input
+                          type="email"
+                          id="email"
+                          name="email"
+                          required
+                          value={formData.email}
+                          onChange={(e) => handleChange('email', e.target.value)}
+                          className="input w-full"
+                          placeholder="your.email@example.com"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label htmlFor="subject" className="block text-sm font-medium text-gray-700 dark:text-white mb-2">
+                        Subject
+                      </label>
+                      <input
+                        type="text"
+                        id="subject"
+                        name="subject"
+                        value={formData.subject}
+                        onChange={(e) => handleChange('subject', e.target.value)}
+                        className="input w-full"
+                        placeholder="What's this about?"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label htmlFor="message" className="block text-sm font-medium text-gray-700 dark:text-white mb-2">
+                        Message *
+                      </label>
+                      <textarea
+                        id="message"
+                        name="message"
+                        rows={6}
+                        required
+                        value={formData.message}
+                        onChange={(e) => handleChange('message', e.target.value)}
+                        className="input w-full resize-none"
+                        placeholder="Tell us more about your inquiry..."
+                      />
+                    </div>
+                    
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="btn btn-primary w-full flex items-center justify-center space-x-2"
+                    >
+                      <FiSend className="w-4 h-4" />
+                      <span>{loading ? 'Sending...' : 'Send Message'}</span>
+                    </button>
+                  </form>
+                </div>
+              </div>
+
+              {/* Contact Information */}
+              <div className="space-y-6">
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-4">CourseHub Headquarters</h3>
-                  <div className="space-y-3 text-gray-600">
-                    <p><strong>Address:</strong> 123 Learning Street, Education City, EC 12345</p>
-                    <p><strong>Phone:</strong> +1 (800) COURSE</p>
-                    <p><strong>Email:</strong> info@coursehub.com</p>
-                    <p><strong>Hours:</strong> Monday - Friday, 9:00 AM - 6:00 PM EST</p>
+                  <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6">Get in touch</h2>
+                  <p className="text-gray-600 dark:text-white mb-8">
+                    We're here to help and answer any questions you might have. We look forward to hearing from you.
+                  </p>
+                </div>
+                
+                <div className="space-y-6">
+                  {contactInfo.map((info, index) => (
+                    <div key={index} className="flex items-start space-x-4">
+                      <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <div className="text-primary-600 dark:text-primary-400">
+                          {info.icon}
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                          {info.title}
+                        </h3>
+                        <p className="text-gray-600 dark:text-white mb-2">
+                          {info.details}
+                        </p>
+                        <a
+                          href={info.href}
+                          className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium transition-colors duration-200"
+                        >
+                          {info.action} →
+                        </a>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* FAQ Section */}
+            <div className="mt-20">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Frequently Asked Questions</h2>
+                <p className="text-lg text-gray-600 dark:text-white">
+                  Quick answers to common questions
+                </p>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="card">
+                  <div className="p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                      How quickly do you respond to inquiries?
+                    </h3>
+                    <p className="text-gray-600 dark:text-white">
+                      We typically respond to all inquiries within 24 hours during business days.
+                    </p>
                   </div>
                 </div>
                 
-                <div className="bg-gray-200 rounded-lg h-64 flex items-center justify-center">
-                  <div className="text-center text-gray-500">
-                    <FiMapPin className="w-16 h-16 mx-auto mb-4" />
-                    <p>Interactive Map</p>
-                    <p className="text-sm">(Would show Google Maps in production)</p>
+                <div className="card">
+                  <div className="p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                      Can I get technical support for courses?
+                    </h3>
+                    <p className="text-gray-600 dark:text-white">
+                      Yes! We provide comprehensive technical support for all our courses and platform features.
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="card">
+                  <div className="p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                      Do you offer refunds?
+                    </h3>
+                    <p className="text-gray-600 dark:text-white">
+                      We offer a 30-day money-back guarantee for all course purchases.
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="card">
+                  <div className="p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                      How can I become an instructor?
+                    </h3>
+                    <p className="text-gray-600 dark:text-white">
+                      We're always looking for qualified instructors. Please contact us with your credentials.
+                    </p>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </section>
-      </div>
-    </Layout>
+        </div>
+      </Layout>
+    </div>
   );
 }

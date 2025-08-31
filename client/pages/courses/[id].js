@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Layout from '../../components/Layout';
+import { useThemeStore } from '../../utils/store';
 import { coursesAPI, cartAPI } from '../../utils/api';
 import { useUserStore, useCartStore } from '../../utils/store';
 import { FiStar, FiUsers, FiClock, FiPlay, FiShoppingCart, FiCheck, FiUser, FiCalendar } from 'react-icons/fi';
@@ -9,6 +10,7 @@ import toast from 'react-hot-toast';
 export default function CourseDetails() {
   const router = useRouter();
   const { id } = router.query;
+  const { theme } = useThemeStore();
   const { user, isAuthenticated } = useUserStore();
   const { addItem, items } = useCartStore();
   
@@ -80,383 +82,380 @@ export default function CourseDetails() {
 
   if (loading) {
     return (
-      <Layout>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-300 rounded w-1/3 mb-4"></div>
-            <div className="h-4 bg-gray-300 rounded w-1/2 mb-8"></div>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              <div className="lg:col-span-2">
-                <div className="h-96 bg-gray-300 rounded mb-6"></div>
-                <div className="space-y-4">
-                  <div className="h-4 bg-gray-300 rounded"></div>
-                  <div className="h-4 bg-gray-300 rounded w-5/6"></div>
-                  <div className="h-4 bg-gray-300 rounded w-4/6"></div>
+      <div className={`min-h-screen transition-colors duration-200 ${theme === 'dark' ? 'dark' : ''}`}>
+        <Layout>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="animate-pulse">
+              <div className="h-8 bg-gray-300 dark:bg-gray-600 rounded w-1/3 mb-4"></div>
+              <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-1/2 mb-8"></div>
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="lg:col-span-2">
+                  <div className="h-96 bg-gray-300 dark:bg-gray-600 rounded mb-6"></div>
+                  <div className="space-y-4">
+                    <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded"></div>
+                    <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-5/6"></div>
+                    <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-4/6"></div>
+                  </div>
                 </div>
+                <div className="h-96 bg-gray-300 dark:bg-gray-600 rounded"></div>
               </div>
-              <div className="h-96 bg-gray-300 rounded"></div>
             </div>
           </div>
-        </div>
-      </Layout>
+        </Layout>
+      </div>
     );
   }
 
   if (!course) {
     return (
-      <Layout>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Course not found</h1>
-          <p className="text-gray-600 mb-6">The course you're looking for doesn't exist.</p>
-          <button
-            onClick={() => router.push('/courses')}
-            className="btn btn-primary"
-          >
-            Browse Courses
-          </button>
-        </div>
-      </Layout>
+      <div className={`min-h-screen transition-colors duration-200 ${theme === 'dark' ? 'dark' : ''}`}>
+        <Layout>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Course Not Found</h1>
+            <p className="text-gray-600 dark:text-white mb-6">
+              The course you're looking for doesn't exist or has been removed.
+            </p>
+            <button
+              onClick={() => router.push('/courses')}
+              className="btn btn-primary"
+            >
+              Browse All Courses
+            </button>
+          </div>
+        </Layout>
+      </div>
     );
   }
 
   return (
-    <Layout>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Course Header */}
-        <div className="mb-8">
-          <nav className="text-sm text-gray-500 mb-4">
-            <button onClick={() => router.push('/courses')} className="hover:text-primary-600">
-              Courses
-            </button>
-            <span className="mx-2">/</span>
-            <span>{course.title}</span>
-          </nav>
-          
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{course.title}</h1>
-          <p className="text-lg text-gray-600 mb-6 max-w-4xl">{course.shortDescription}</p>
-          
-          <div className="flex flex-wrap items-center gap-6 text-sm text-gray-600">
-            <div className="flex items-center space-x-1">
-              <FiUser className="w-4 h-4" />
-              <span>By {course.instructor.name}</span>
-            </div>
-            <div className="flex items-center space-x-1">
-              <FiUsers className="w-4 h-4" />
-              <span>{course.enrollmentCount || 0} students enrolled</span>
-            </div>
-            <div className="flex items-center space-x-1">
-              <FiClock className="w-4 h-4" />
-              <span>{course.duration}</span>
-            </div>
-            {course.rating && course.rating.average > 0 && (
-              <div className="flex items-center space-x-1">
-                <FiStar className="w-4 h-4 text-yellow-400 fill-current" />
-                <span>{course.rating.average.toFixed(1)} ({course.rating.count} reviews)</span>
-              </div>
-            )}
-            <div className="flex items-center space-x-1">
-              <FiCalendar className="w-4 h-4" />
-              <span>Last updated {new Date(course.updatedAt).toLocaleDateString()}</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-2">
-            {/* Course Image/Video */}
-            <div className="card mb-8">
-              <div className="relative">
-                <img
-                  src={course.thumbnail || 'https://via.placeholder.com/800x450?text=Course+Image'}
-                  alt={course.title}
-                  className="w-full h-96 object-cover"
-                />
-                {course.videoUrl && (
-                  <div className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center">
-                    <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center cursor-pointer hover:bg-gray-100 transition-colors">
-                      <FiPlay className="w-10 h-10 text-primary-600 ml-1" />
-                    </div>
-                  </div>
-                )}
+    <div className={`min-h-screen transition-colors duration-200 ${theme === 'dark' ? 'dark' : ''}`}>
+      <Layout>
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            {/* Course Header */}
+            <div className="mb-8">
+              <nav className="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400 mb-4">
+                <button
+                  onClick={() => router.push('/courses')}
+                  className="hover:text-gray-700 dark:hover:text-white transition-colors"
+                >
+                  Courses
+                </button>
+                <span>/</span>
+                <span className="text-gray-900 dark:text-white">{course.title}</span>
+              </nav>
+              
+              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+                {course.title}
+              </h1>
+              
+              <p className="text-lg text-gray-600 dark:text-white mb-6 max-w-4xl">
+                {course.description}
+              </p>
+              
+              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-300">
+                <div className="flex items-center space-x-1">
+                  <FiStar className="w-4 h-4 text-yellow-500" />
+                  <span>{course.rating?.average || 0}</span>
+                  <span>({course.reviews?.length || 0} reviews)</span>
+                </div>
+                <div className="flex items-center space-x-1">
+                  <FiUsers className="w-4 h-4" />
+                  <span>{course.enrollmentCount || 0} students enrolled</span>
+                </div>
+                <div className="flex items-center space-x-1">
+                  <FiClock className="w-4 h-4" />
+                  <span>{course.duration}</span>
+                </div>
+                <div className="flex items-center space-x-1">
+                  <FiCalendar className="w-4 h-4" />
+                  <span>Last updated {new Date(course.updatedAt).toLocaleDateString()}</span>
+                </div>
               </div>
             </div>
 
-            {/* Tabs */}
-            <div className="card">
-              <div className="border-b border-gray-200">
-                <nav className="flex space-x-8">
-                  {['overview', 'curriculum', 'instructor', 'reviews'].map((tab) => (
-                    <button
-                      key={tab}
-                      onClick={() => setActiveTab(tab)}
-                      className={`py-4 px-1 border-b-2 font-medium text-sm capitalize ${
-                        activeTab === tab
-                          ? 'border-primary-500 text-primary-600'
-                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                      }`}
-                    >
-                      {tab}
-                    </button>
-                  ))}
-                </nav>
-              </div>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Main Content */}
+              <div className="lg:col-span-2">
+                {/* Course Image */}
+                <div className="mb-8">
+                  <img
+                    src={course.thumbnail || '/placeholder-course.jpg'}
+                    alt={course.title}
+                    className="w-full h-96 object-cover rounded-lg"
+                  />
+                </div>
 
-              <div className="p-6">
-                {/* Overview Tab */}
-                {activeTab === 'overview' && (
-                  <div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-4">What you'll learn</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                      {course.curriculum?.slice(0, 6).map((item, index) => (
-                        <div key={index} className="flex items-start space-x-3">
-                          <FiCheck className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                          <span className="text-gray-700">{item.title}</span>
-                        </div>
-                      ))}
-                    </div>
-                    
-                    <h3 className="text-xl font-semibold text-gray-900 mb-4">Description</h3>
-                    <p className="text-gray-700 leading-relaxed">{course.description}</p>
-                  </div>
-                )}
-
-                {/* Curriculum Tab */}
-                {activeTab === 'curriculum' && (
-                  <div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-4">Course Content</h3>
-                    <div className="space-y-4">
-                      {course.curriculum?.map((item, index) => (
-                        <div key={index} className="border border-gray-200 rounded-lg p-4">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <h4 className="font-medium text-gray-900">{item.title}</h4>
-                              <p className="text-sm text-gray-600 mt-1">{item.description}</p>
-                            </div>
-                            <span className="text-sm text-gray-500">{item.duration}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Instructor Tab */}
-                {activeTab === 'instructor' && (
-                  <div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-4">About the Instructor</h3>
-                    <div className="flex items-start space-x-4">
-                      <div className="w-20 h-20 bg-primary-100 rounded-full flex items-center justify-center">
-                        <span className="text-2xl font-bold text-primary-600">
-                          {course.instructor.name.charAt(0).toUpperCase()}
-                        </span>
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="text-lg font-semibold text-gray-900 mb-2">{course.instructor.name}</h4>
-                        <p className="text-gray-700 leading-relaxed">{course.instructor.bio}</p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Reviews Tab */}
-                {activeTab === 'reviews' && (
-                  <div>
-                    <div className="flex items-center justify-between mb-6">
-                      <h3 className="text-xl font-semibold text-gray-900">Student Reviews</h3>
-                      {isAuthenticated() && !isPurchased && (
+                {/* Tabs */}
+                <div className="mb-8">
+                  <div className="border-b border-gray-200 dark:border-gray-700">
+                    <nav className="flex space-x-8">
+                      {['overview', 'curriculum', 'reviews'].map((tab) => (
                         <button
-                          onClick={() => setActiveTab('write-review')}
-                          className="btn btn-outline"
+                          key={tab}
+                          onClick={() => setActiveTab(tab)}
+                          className={`py-2 px-1 border-b-2 font-medium text-sm capitalize transition-colors duration-200 ${
+                            activeTab === tab
+                              ? 'border-primary-500 text-primary-600 dark:text-primary-400'
+                              : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                          }`}
                         >
-                          Write a Review
+                          {tab}
                         </button>
-                      )}
-                    </div>
+                      ))}
+                    </nav>
+                  </div>
 
-                    {/* Write Review Form */}
-                    {activeTab === 'write-review' && (
-                      <div className="card mb-6">
-                        <h4 className="text-lg font-semibold text-gray-900 mb-4">Write a Review</h4>
-                        <form onSubmit={handleReviewSubmit}>
-                          <div className="mb-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Rating</label>
-                            <select
-                              value={reviewForm.rating}
-                              onChange={(e) => setReviewForm(prev => ({ ...prev, rating: parseInt(e.target.value) }))}
-                              className="input"
-                            >
-                              {[5, 4, 3, 2, 1].map(rating => (
-                                <option key={rating} value={rating}>
-                                  {rating} Star{rating !== 1 ? 's' : ''}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                          <div className="mb-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Comment</label>
-                            <textarea
-                              value={reviewForm.comment}
-                              onChange={(e) => setReviewForm(prev => ({ ...prev, comment: e.target.value }))}
-                              rows={4}
-                              className="input"
-                              placeholder="Share your thoughts about this course..."
-                              required
-                            />
-                          </div>
-                          <div className="flex space-x-3">
-                            <button type="submit" className="btn btn-primary">
-                              Submit Review
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setActiveTab('reviews')}
-                              className="btn btn-secondary"
-                            >
-                              Cancel
-                            </button>
-                          </div>
-                        </form>
+                  {/* Tab Content */}
+                  <div className="mt-6">
+                    {activeTab === 'overview' && (
+                      <div className="prose prose-lg max-w-none dark:prose-invert">
+                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">What you'll learn</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                          {course.learningObjectives?.map((objective, index) => (
+                            <div key={index} className="flex items-start space-x-2">
+                              <FiCheck className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                              <span className="text-gray-700 dark:text-white">{objective}</span>
+                            </div>
+                          ))}
+                        </div>
+                        
+                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Requirements</h3>
+                        <ul className="text-gray-700 dark:text-white mb-6">
+                          {course.requirements?.map((requirement, index) => (
+                            <li key={index}>{requirement}</li>
+                          ))}
+                        </ul>
+                        
+                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Description</h3>
+                        <p className="text-gray-700 dark:text-white leading-relaxed">
+                          {course.description}
+                        </p>
                       </div>
                     )}
 
-                    {/* Reviews List */}
-                    <div className="space-y-6">
-                      {course.reviews && course.reviews.length > 0 ? (
-                        course.reviews.map((review, index) => (
-                          <div key={index} className="border-b border-gray-200 pb-6 last:border-b-0">
-                            <div className="flex items-center justify-between mb-2">
-                              <div className="flex items-center space-x-2">
-                                <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
-                                  <span className="text-sm font-medium text-primary-600">
-                                    {review.userId?.name?.charAt(0)?.toUpperCase() || 'U'}
-                                  </span>
+                    {activeTab === 'curriculum' && (
+                      <div>
+                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Course Curriculum</h3>
+                        <div className="space-y-4">
+                          {course.curriculum?.map((section, index) => (
+                            <div key={index} className="border border-gray-200 dark:border-gray-700 rounded-lg">
+                              <div className="p-4 bg-gray-50 dark:bg-gray-800">
+                                <h4 className="font-medium text-gray-900 dark:text-white">
+                                  Section {index + 1}: {section.title}
+                                </h4>
+                                <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
+                                  {section.lessons?.length || 0} lessons
+                                </p>
+                              </div>
+                              {section.lessons && (
+                                <div className="p-4">
+                                  <ul className="space-y-2">
+                                    {section.lessons.map((lesson, lessonIndex) => (
+                                      <li key={lessonIndex} className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-300">
+                                        <FiPlay className="w-4 h-4 text-gray-400" />
+                                        <span>{lesson.title}</span>
+                                        <span className="text-gray-400">• {lesson.duration}</span>
+                                      </li>
+                                    ))}
+                                  </ul>
                                 </div>
-                                <span className="font-medium text-gray-900">
-                                  {review.userId?.name || 'Anonymous'}
-                                </span>
-                              </div>
-                              <div className="flex items-center space-x-1">
-                                {[...Array(5)].map((_, i) => (
-                                  <FiStar
-                                    key={i}
-                                    className={`w-4 h-4 ${
-                                      i < review.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'
-                                    }`}
-                                  />
-                                ))}
-                              </div>
+                              )}
                             </div>
-                            <p className="text-gray-700">{review.comment}</p>
-                            <div className="text-sm text-gray-500 mt-2">
-                              {new Date(review.createdAt).toLocaleDateString()}
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {activeTab === 'reviews' && (
+                      <div>
+                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Student Reviews</h3>
+                        
+                        {/* Review Form */}
+                        {isAuthenticated() && !isPurchased && (
+                          <div className="card mb-6">
+                            <div className="p-6">
+                              <h4 className="font-medium text-gray-900 dark:text-white mb-4">Write a Review</h4>
+                              <form onSubmit={handleReviewSubmit} className="space-y-4">
+                                <div>
+                                  <label className="block text-sm font-medium text-gray-700 dark:text-white mb-2">
+                                    Rating
+                                  </label>
+                                  <div className="flex space-x-2">
+                                    {[1, 2, 3, 4, 5].map((star) => (
+                                      <button
+                                        key={star}
+                                        type="button"
+                                        onClick={() => setReviewForm(prev => ({ ...prev, rating: star }))}
+                                        className="text-2xl text-yellow-400 hover:text-yellow-500 transition-colors"
+                                      >
+                                        {star <= reviewForm.rating ? '★' : '☆'}
+                                      </button>
+                                    ))}
+                                  </div>
+                                </div>
+                                
+                                <div>
+                                  <label className="block text-sm font-medium text-gray-700 dark:text-white mb-2">
+                                    Comment
+                                  </label>
+                                  <textarea
+                                    value={reviewForm.comment}
+                                    onChange={(e) => setReviewForm(prev => ({ ...prev, comment: e.target.value }))}
+                                    rows={4}
+                                    className="input w-full"
+                                    placeholder="Share your experience with this course..."
+                                    required
+                                  />
+                                </div>
+                                
+                                <button type="submit" className="btn btn-primary">
+                                  Submit Review
+                                </button>
+                              </form>
                             </div>
                           </div>
-                        ))
-                      ) : (
-                        <div className="text-center py-8 text-gray-500">
-                          <p>No reviews yet. Be the first to review this course!</p>
+                        )}
+                        
+                        {/* Reviews List */}
+                        <div className="space-y-4">
+                          {course.reviews?.length > 0 ? (
+                            course.reviews.map((review, index) => (
+                              <div key={index} className="card">
+                                <div className="p-6">
+                                  <div className="flex items-center justify-between mb-3">
+                                    <div className="flex items-center space-x-3">
+                                      <div className="w-10 h-10 bg-primary-100 dark:bg-primary-900 rounded-full flex items-center justify-center">
+                                        <FiUser className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+                                      </div>
+                                      <div>
+                                        <p className="font-medium text-gray-900 dark:text-white">
+                                          {review.user?.name || 'Anonymous'}
+                                        </p>
+                                        <div className="flex items-center space-x-1">
+                                          {[1, 2, 3, 4, 5].map((star) => (
+                                            <FiStar
+                                              key={star}
+                                              className={`w-4 h-4 ${
+                                                star <= review.rating ? 'text-yellow-500 fill-current' : 'text-gray-300 dark:text-gray-600'
+                                              }`}
+                                            />
+                                          ))}
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                                      {new Date(review.createdAt).toLocaleDateString()}
+                                    </span>
+                                  </div>
+                                  <p className="text-gray-700 dark:text-white">{review.comment}</p>
+                                </div>
+                              </div>
+                            ))
+                          ) : (
+                            <div className="text-center py-8">
+                              <FiStar className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+                              <h4 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No reviews yet</h4>
+                              <p className="text-gray-600 dark:text-white">
+                                Be the first to review this course!
+                              </p>
+                            </div>
+                          )}
                         </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Sidebar */}
+              <div className="lg:col-span-1">
+                <div className="sticky top-8">
+                  <div className="card">
+                    <div className="p-6">
+                      <div className="text-center mb-6">
+                        <div className="text-3xl font-bold text-primary-600 dark:text-primary-400 mb-2">
+                          ${course.price}
+                        </div>
+                        <p className="text-sm text-gray-600 dark:text-gray-300">
+                          One-time payment
+                        </p>
+                      </div>
+                      
+                      <div className="space-y-4 mb-6">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-600 dark:text-gray-300">Course includes:</span>
+                          <span className="text-gray-900 dark:text-white font-medium">Lifetime access</span>
+                        </div>
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-600 dark:text-gray-300">Certificate:</span>
+                          <span className="text-gray-900 dark:text-white font-medium">Yes</span>
+                        </div>
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-600 dark:text-gray-300">Level:</span>
+                          <span className="text-gray-900 dark:text-white font-medium">{course.level}</span>
+                        </div>
+                      </div>
+                      
+                      {isPurchased ? (
+                        <button
+                          onClick={() => router.push('/my-courses')}
+                          className="w-full btn btn-primary mb-3"
+                        >
+                          <FiPlay className="w-4 h-4 mr-2" />
+                          Continue Learning
+                        </button>
+                      ) : isInCart ? (
+                        <button
+                          onClick={() => router.push('/cart')}
+                          className="w-full btn btn-outline mb-3"
+                        >
+                          <FiShoppingCart className="w-4 h-4 mr-2" />
+                          View Cart
+                        </button>
+                      ) : (
+                        <button
+                          onClick={handleAddToCart}
+                          className="w-full btn btn-primary mb-3"
+                        >
+                          <FiShoppingCart className="w-4 h-4 mr-2" />
+                          Add to Cart
+                        </button>
                       )}
+                      
+                      <div className="text-center">
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          30-Day Money-Back Guarantee
+                        </p>
+                      </div>
                     </div>
                   </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Sidebar */}
-          <div className="lg:col-span-1">
-            <div className="card p-6 sticky top-8">
-              <div className="text-center mb-6">
-                <div className="text-3xl font-bold text-primary-600 mb-2">
-                  ${course.price}
-                </div>
-                {course.originalPrice && course.originalPrice > course.price && (
-                  <div className="text-lg text-gray-500 line-through">
-                    ${course.originalPrice}
+                  
+                  {/* Instructor Info */}
+                  <div className="card mt-6">
+                    <div className="p-6">
+                      <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Instructor</h3>
+                      <div className="flex items-center space-x-3">
+                        <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900 rounded-full flex items-center justify-center">
+                          <FiUser className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-900 dark:text-white">
+                            {course.instructor?.name || 'Unknown Instructor'}
+                          </p>
+                          <p className="text-sm text-gray-600 dark:text-gray-300">
+                            {course.instructor?.bio || 'Course instructor'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                )}
-              </div>
-
-              <div className="space-y-4 mb-6">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600">Category</span>
-                  <span className="font-medium">{course.category}</span>
                 </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600">Level</span>
-                  <span className="font-medium">{course.level}</span>
-                </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600">Duration</span>
-                  <span className="font-medium">{course.duration}</span>
-                </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600">Language</span>
-                  <span className="font-medium">{course.language}</span>
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                {isPurchased ? (
-                  <button
-                    disabled
-                    className="w-full btn btn-secondary cursor-not-allowed"
-                  >
-                    Already Purchased
-                  </button>
-                ) : isInCart ? (
-                  <button
-                    onClick={() => router.push('/cart')}
-                    className="w-full btn btn-outline"
-                  >
-                    <FiShoppingCart className="w-4 h-4 mr-2" />
-                    View in Cart
-                  </button>
-                ) : (
-                  <button
-                    onClick={handleAddToCart}
-                    className="w-full btn btn-primary"
-                  >
-                    <FiShoppingCart className="w-4 h-4 mr-2" />
-                    Add to Cart
-                  </button>
-                )}
-                
-                <button
-                  onClick={() => router.push('/courses')}
-                  className="w-full btn btn-secondary"
-                >
-                  Browse More Courses
-                </button>
-              </div>
-
-              <div className="mt-6 pt-6 border-t border-gray-200">
-                <h4 className="font-medium text-gray-900 mb-3">This course includes:</h4>
-                <ul className="space-y-2 text-sm text-gray-600">
-                  <li className="flex items-center space-x-2">
-                    <FiCheck className="w-4 h-4 text-green-500" />
-                    <span>Full lifetime access</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <FiCheck className="w-4 h-4 text-green-500" />
-                    <span>Access on mobile and TV</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <FiCheck className="w-4 h-4 text-green-500" />
-                    <span>Certificate of completion</span>
-                  </li>
-                  <li className="flex items-center space-x-2">
-                    <FiCheck className="w-4 h-4 text-green-500" />
-                    <span>30-day money-back guarantee</span>
-                  </li>
-                </ul>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </Layout>
+      </Layout>
+    </div>
   );
 }

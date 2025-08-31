@@ -7,15 +7,20 @@ import { useThemeStore } from '../utils/store';
 export default function Home() {
   const [featuredCourses, setFeaturedCourses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const { theme } = useThemeStore();
 
   useEffect(() => {
     const fetchFeaturedCourses = async () => {
       try {
-        const response = await coursesAPI.getFeatured();
+        setLoading(true);
+        setError(null);
+        
+        const response = await coursesAPI.getAll({ featured: true, limit: 6 });
         setFeaturedCourses(response.data.courses || []);
       } catch (error) {
         console.error('Error fetching featured courses:', error);
+        setError('Failed to load featured courses. Please try again later.');
       } finally {
         setLoading(false);
       }
@@ -130,8 +135,36 @@ export default function Home() {
           </div>
 
           {loading ? (
-            <div className="flex justify-center">
+            <div className="flex justify-center py-12">
               <div className="spinner w-8 h-8 border-2 rounded-full animate-spin"></div>
+            </div>
+          ) : error ? (
+            <div className="text-center py-12">
+              <div className="text-gray-400 dark:text-gray-500 mb-4">
+                <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Error Loading Courses</h3>
+              <p className="text-gray-600 dark:text-gray-300 mb-4">{error}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="btn-primary px-6 py-2"
+              >
+                Try Again
+              </button>
+            </div>
+          ) : featuredCourses.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="text-gray-400 dark:text-gray-500 mb-4">
+                <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.47-.881-6.08-2.33" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No featured courses available</h3>
+              <p className="text-gray-600 dark:text-gray-300 mb-4">
+                Check back later for featured courses
+              </p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -149,13 +182,16 @@ export default function Home() {
                       </span>
                     </div>
                   </div>
+                  
                   <div className="p-6">
                     <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                       {course.title}
                     </h3>
+                    
                     <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-2">
                       {course.description}
                     </p>
+                    
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
                         <span className="badge-secondary px-2 py-1 rounded text-xs">

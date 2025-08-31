@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { paymentAPI } from '../utils/api';
+import { useThemeStore } from '../utils/store';
 import toast from 'react-hot-toast';
 import Layout from '../components/Layout';
 
 export default function TestPayment() {
   const router = useRouter();
+  const { theme } = useThemeStore();
   const [loading, setLoading] = useState(false);
   const [testResults, setTestResults] = useState([]);
   const [paymentMethods, setPaymentMethods] = useState([]);
@@ -103,237 +105,233 @@ export default function TestPayment() {
     }
   };
 
-  const getMethodColor = (method) => {
-    switch (method) {
-      case 'card': return 'text-blue-600';
-      case 'paypal': return 'text-blue-500';
-      case 'bank_transfer': return 'text-green-600';
-      default: return 'text-gray-600';
+  const getStatusIcon = (success) => {
+    if (success) {
+      return (
+        <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+        </svg>
+      );
+    } else {
+      return (
+        <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      );
     }
   };
 
+  const getStatusColor = (success) => {
+    return success ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400';
+  };
+
+  const getStatusBgColor = (success) => {
+    return success ? 'bg-green-100 dark:bg-green-900' : 'bg-red-100 dark:bg-red-900';
+  };
+
   return (
-    <Layout>
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="max-w-4xl mx-auto px-4">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              🧪 Payment System Testing
-            </h1>
-            <p className="text-gray-600">
-              Test the dummy payment system with different payment methods
-            </p>
-          </div>
-
-          {/* Payment Methods */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            {paymentMethods.map((method) => {
-              const Icon = getMethodIcon(method.id);
-              return (
-                <div
-                  key={method.id}
-                  className="bg-white rounded-lg shadow-md p-6 border border-gray-200"
-                >
-                  <div className="text-center">
-                    <Icon className={`w-12 h-12 mx-auto mb-3 ${getMethodColor(method.id)}`} />
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      {method.name}
-                    </h3>
-                    <p className="text-sm text-gray-600 mb-4">
-                      {method.description}
-                    </p>
-                    <button
-                      onClick={() => runTestPayment(method.id)}
-                      disabled={loading}
-                      className="w-full bg-primary-600 text-white py-2 px-4 rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    >
-                      {loading ? 'Testing...' : 'Test Payment'}
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Test Results */}
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-gray-900">
-                Test Results
-              </h2>
-              <div className="flex space-x-2">
-                <button
-                  onClick={fetchPaymentMethods}
-                  className="flex items-center px-3 py-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
-                >
-                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                  </svg>
-                  Refresh
-                </button>
-                <button
-                  onClick={clearResults}
-                  className="px-3 py-2 text-sm text-red-600 hover:text-red-700 transition-colors"
-                >
-                  Clear Results
-                </button>
-              </div>
+    <div className={`min-h-screen transition-colors duration-200 ${theme === 'dark' ? 'dark' : ''}`}>
+      <Layout>
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            {/* Header */}
+            <div className="text-center mb-8">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Payment Gateway Testing</h1>
+              <p className="text-gray-600 dark:text-gray-300">
+                Test different payment methods and verify gateway integration
+              </p>
             </div>
 
-            {testResults.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                <svg className="w-12 h-12 mx-auto mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                </svg>
-                <p>No test results yet. Run a test payment to see results here.</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {testResults.map((result) => (
-                  <div
-                    key={result.id}
-                    className={`border rounded-lg p-4 ${
-                      result.success
-                        ? 'border-green-200 bg-green-50'
-                        : 'border-red-200 bg-red-50'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        {result.success ? (
-                          <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                        ) : (
-                          <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                          </svg>
-                        )}
-                        <div>
-                          <div className="flex items-center space-x-2">
-                            <span className="font-medium text-gray-900">
-                              {result.method.toUpperCase()}
-                            </span>
-                            <span className={`text-sm px-2 py-1 rounded-full ${
-                              result.success
-                                ? 'bg-green-100 text-green-800'
-                                : 'bg-red-100 text-red-800'
-                            }`}>
-                              {result.success ? 'SUCCESS' : 'FAILED'}
-                            </span>
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            {result.timestamp}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-sm text-gray-600">
-                          Payment ID: {result.details.paymentId || 'N/A'}
-                        </div>
-                        {result.details.transactionId && (
-                          <div className="text-sm text-gray-600">
-                            Txn: {result.details.transactionId}
-                          </div>
-                        )}
-                      </div>
-                    </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Payment Methods */}
+              <div className="space-y-6">
+                <div className="card">
+                  <div className="p-6">
+                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Available Payment Methods</h2>
                     
-                    {result.details.error && (
-                      <div className="mt-2 text-sm text-red-600">
-                        Error: {result.details.error}
+                    {paymentMethods.length === 0 ? (
+                      <div className="text-center py-8">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-4"></div>
+                        <p className="text-gray-600 dark:text-gray-300">Loading payment methods...</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {paymentMethods.map((method) => (
+                          <button
+                            key={method.id}
+                            onClick={() => runTestPayment(method.type)}
+                            disabled={loading}
+                            className="w-full flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <div className="flex items-center space-x-3">
+                              <div className="text-gray-600 dark:text-gray-400">
+                                {getMethodIcon(method.type)}
+                              </div>
+                              <div className="text-left">
+                                <p className="font-medium text-gray-900 dark:text-white capitalize">
+                                  {method.type.replace('_', ' ')}
+                                </p>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">
+                                  {method.description || 'Test payment method'}
+                                </p>
+                              </div>
+                            </div>
+                            
+                            {loading ? (
+                              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary-600"></div>
+                            ) : (
+                              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                              </svg>
+                            )}
+                          </button>
+                        ))}
                       </div>
                     )}
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
+                </div>
 
-          {/* API Endpoints Info */}
-          <div className="bg-white rounded-lg shadow-md p-6 mt-8">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              Available API Endpoints
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <div className="text-sm">
-                  <span className="font-mono bg-gray-100 px-2 py-1 rounded">POST /api/payments/process</span>
-                  <span className="text-gray-600 ml-2">Process payment</span>
-                </div>
-                <div className="text-sm">
-                  <span className="font-mono bg-gray-100 px-2 py-1 rounded">GET /api/payments/status/:orderId</span>
-                  <span className="text-gray-600 ml-2">Get payment status</span>
-                </div>
-                <div className="text-sm">
-                  <span className="font-mono bg-gray-100 px-2 py-1 rounded">POST /api/payments/refund/:orderId</span>
-                  <span className="text-gray-600 ml-2">Refund payment</span>
+                {/* Test Configuration */}
+                <div className="card">
+                  <div className="p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Test Configuration</h3>
+                    <div className="space-y-3 text-sm text-gray-600 dark:text-gray-300">
+                      <div className="flex justify-between">
+                        <span>Environment:</span>
+                        <span className="font-medium text-green-600 dark:text-green-400">Test Mode</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Currency:</span>
+                        <span className="font-medium">USD</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Amount Range:</span>
+                        <span className="font-medium">$10 - $100</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Auto-generated:</span>
+                        <span className="font-medium text-blue-600 dark:text-blue-400">Yes</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className="space-y-2">
-                <div className="text-sm">
-                  <span className="font-mono bg-gray-100 px-2 py-1 rounded">GET /api/payments/methods</span>
-                  <span className="text-gray-600 ml-2">Get payment methods</span>
+
+              {/* Test Results */}
+              <div className="space-y-6">
+                <div className="card">
+                  <div className="p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Test Results</h2>
+                      {testResults.length > 0 && (
+                        <button
+                          onClick={clearResults}
+                          className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                        >
+                          Clear All
+                        </button>
+                      )}
+                    </div>
+                    
+                    {testResults.length === 0 ? (
+                      <div className="text-center py-8">
+                        <svg className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <p className="text-gray-600 dark:text-gray-300">No test results yet</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Run a test payment to see results here</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-3 max-h-96 overflow-y-auto">
+                        {testResults.map((result) => (
+                          <div
+                            key={result.id}
+                            className={`p-4 rounded-lg border ${getStatusBgColor(result.success)} border-gray-200 dark:border-gray-700`}
+                          >
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center space-x-2">
+                                {getStatusIcon(result.success)}
+                                <span className={`font-medium capitalize ${getStatusColor(result.success)}`}>
+                                  {result.method.replace('_', ' ')}
+                                </span>
+                              </div>
+                              <span className="text-xs text-gray-500 dark:text-gray-400">
+                                {result.timestamp}
+                              </span>
+                            </div>
+                            
+                            <div className="text-sm">
+                              <p className="text-gray-700 dark:text-gray-300 mb-1">
+                                Status: <span className={getStatusColor(result.success)}>
+                                  {result.success ? 'Success' : 'Failed'}
+                                </span>
+                              </p>
+                              
+                              {result.details.error && (
+                                <p className="text-red-600 dark:text-red-400 text-xs">
+                                  Error: {result.details.error}
+                                </p>
+                              )}
+                              
+                              {result.details.transactionId && (
+                                <p className="text-gray-600 dark:text-gray-400 text-xs">
+                                  Transaction ID: {result.details.transactionId}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <div className="text-sm">
-                  <span className="font-mono bg-gray-100 px-2 py-1 rounded">POST /api/payments/test</span>
-                  <span className="text-gray-600 ml-2">Test payment (dev)</span>
-                </div>
+
+                {/* Test Statistics */}
+                {testResults.length > 0 && (
+                  <div className="card">
+                    <div className="p-6">
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Test Statistics</h3>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="text-center">
+                          <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+                            {testResults.filter(r => r.success).length}
+                          </p>
+                          <p className="text-sm text-gray-600 dark:text-gray-300">Successful</p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-2xl font-bold text-red-600 dark:text-red-400">
+                            {testResults.filter(r => !r.success).length}
+                          </p>
+                          <p className="text-sm text-gray-600 dark:text-gray-300">Failed</p>
+                        </div>
+                      </div>
+                      
+                      <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                        <div className="text-center">
+                          <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                            {testResults.length > 0 ? Math.round((testResults.filter(r => r.success).length / testResults.length) * 100) : 0}%
+                          </p>
+                          <p className="text-sm text-gray-600 dark:text-gray-300">Success Rate</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
-          </div>
 
-          {/* Features */}
-          <div className="bg-white rounded-lg shadow-md p-6 mt-8">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              🚀 Features
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <div className="flex items-center text-sm">
-                  <svg className="w-4 h-4 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  Mock payment processing
-                </div>
-                <div className="flex items-center text-sm">
-                  <svg className="w-4 h-4 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                  </svg>
-                  Multiple payment methods
-                </div>
-                <div className="flex items-center text-sm">
-                  <svg className="w-4 h-4 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                  </svg>
-                  Realistic processing delays
-                </div>
-              </div>
-              <div className="space-y-2">
-                <div className="flex items-center text-sm">
-                  <svg className="w-4 h-4 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  95% success rate simulation
-                </div>
-                <div className="flex items-center text-sm">
-                  <svg className="w-4 h-4 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                  </svg>
-                  Refund processing
-                </div>
-                <div className="flex items-center text-sm">
-                  <svg className="w-4 h-4 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                  </svg>
-                  Order status updates
-                </div>
+            {/* Footer Info */}
+            <div className="mt-12 text-center">
+              <div className="inline-flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>This is a test environment. No real payments will be processed.</span>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </Layout>
+      </Layout>
+    </div>
   );
 }

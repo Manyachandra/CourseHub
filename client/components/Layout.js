@@ -71,18 +71,22 @@ export default function Layout({ children }) {
               >
                 Categories
               </Link>
-              <Link 
-                href="/about" 
-                className={`nav-link ${isActive('/about') ? 'active' : ''}`}
-              >
-                About
-              </Link>
-              <Link 
-                href="/contact" 
-                className={`nav-link ${isActive('/contact') ? 'active' : ''}`}
-              >
-                Contact
-              </Link>
+              {user && (
+                <Link 
+                  href="/my-courses" 
+                  className={`nav-link ${isActive('/my-courses') ? 'active' : ''}`}
+                >
+                  My Courses
+                </Link>
+              )}
+              {user && user.role === 'admin' && (
+                <Link 
+                  href="/test-payment" 
+                  className="nav-link"
+                >
+                  🧪 Test Payment
+                </Link>
+              )}
             </nav>
 
             {/* Right side items */}
@@ -104,54 +108,45 @@ export default function Layout({ children }) {
 
               {/* User Menu */}
               {user ? (
-                <div className="relative">
-                  <div className="flex items-center space-x-3">
-                    <Link 
-                      href="/my-courses" 
-                      className="text-sm text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200"
-                    >
-                      My Courses
-                    </Link>
-                    <Link 
-                      href="/my-orders" 
-                      className="text-sm text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200"
-                    >
-                      My Orders
-                    </Link>
-                    <Link 
-                      href="/profile" 
-                      className="text-sm text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200"
-                    >
-                      Profile
-                    </Link>
-                    {user.role === 'admin' && (
-                      <Link 
-                        href="/admin-dashboard" 
-                        className="text-sm text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200"
-                      >
-                        Admin
+                <div className="relative group">
+                  <button className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                    <div className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center">
+                      <span className="text-white font-medium text-sm">
+                        {user?.name?.charAt(0)?.toUpperCase()}
+                      </span>
+                    </div>
+                    <span className="hidden sm:block text-gray-700 dark:text-gray-300">{user?.name}</span>
+                  </button>
+                  
+                  {/* Dropdown Menu */}
+                  <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                    <div className="py-2">
+                      <Link href="/profile" className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
+                        Profile
                       </Link>
-                    )}
-                    <button
-                      onClick={handleLogout}
-                      className="text-sm text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-200"
-                    >
-                      Logout
-                    </button>
+                      <Link href="/my-orders" className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
+                        My Orders
+                      </Link>
+                      {user?.role === 'admin' && (
+                        <Link href="/admin-dashboard" className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
+                          Admin Dashboard
+                        </Link>
+                      )}
+                      <button
+                        onClick={handleLogout}
+                        className="w-full text-left px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+                      >
+                        Logout
+                      </button>
+                    </div>
                   </div>
                 </div>
               ) : (
-                <div className="flex items-center space-x-4">
-                  <Link 
-                    href="/login" 
-                    className="text-sm text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200"
-                  >
+                <div className="flex items-center space-x-3">
+                  <Link href="/login" className="btn btn-outline dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:border-gray-500">
                     Login
                   </Link>
-                  <Link 
-                    href="/register" 
-                    className="btn-primary px-4 py-2 rounded-lg text-sm"
-                  >
+                  <Link href="/register" className="btn btn-primary">
                     Sign Up
                   </Link>
                 </div>
@@ -188,20 +183,6 @@ export default function Layout({ children }) {
               >
                 Categories
               </Link>
-              <Link 
-                href="/about" 
-                className={`block px-3 py-2 rounded-md text-base font-medium nav-link ${isActive('/about') ? 'active' : ''}`}
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                About
-              </Link>
-              <Link 
-                href="/contact" 
-                className={`block px-3 py-2 rounded-md text-base font-medium nav-link ${isActive('/contact') ? 'active' : ''}`}
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Contact
-              </Link>
               {user && (
                 <>
                   <Link 
@@ -212,27 +193,36 @@ export default function Layout({ children }) {
                     My Courses
                   </Link>
                   <Link 
-                    href="/my-orders" 
-                    className="block px-3 py-2 rounded-md text-base font-medium nav-link"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    My Orders
-                  </Link>
-                  <Link 
                     href="/profile" 
                     className="block px-3 py-2 rounded-md text-base font-medium nav-link"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Profile
                   </Link>
+                  <Link 
+                    href="/my-orders" 
+                    className="block px-3 py-2 rounded-md text-base font-medium nav-link"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    My Orders
+                  </Link>
                   {user.role === 'admin' && (
-                    <Link 
-                      href="/admin-dashboard" 
-                      className="block px-3 py-2 rounded-md text-base font-medium nav-link"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      Admin
-                    </Link>
+                    <>
+                      <Link 
+                        href="/admin-dashboard" 
+                        className="block px-3 py-2 rounded-md text-base font-medium nav-link"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        Admin Dashboard
+                      </Link>
+                      <Link 
+                        href="/test-payment" 
+                        className="block px-3 py-2 rounded-md text-base font-medium nav-link"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        🧪 Test Payment
+                      </Link>
+                    </>
                   )}
                   <button
                     onClick={() => {
