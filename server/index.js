@@ -49,11 +49,12 @@ app.use(session({
     ttl: 24 * 60 * 60 // 1 day
   }),
   cookie: {
-    secure: process.env.NODE_ENV === 'production',
+    secure: true, // Always use secure in production
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000, // 1 day
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-    domain: process.env.NODE_ENV === 'production' ? '.vercel.app' : undefined
+    sameSite: 'none', // Allow cross-site cookies
+    domain: '.vercel.app', // Allow sharing across vercel.app subdomains
+    path: '/'
   }
 }));
 
@@ -89,6 +90,17 @@ app.get('/api/test', (req, res) => {
     message: 'Server is running!', 
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV || 'development'
+  });
+});
+
+// Session test route
+app.get('/api/session-test', (req, res) => {
+  res.json({
+    sessionID: req.sessionID,
+    hasSession: !!req.session,
+    user: req.session?.user,
+    cookies: req.headers.cookie,
+    origin: req.headers.origin
   });
 });
 
