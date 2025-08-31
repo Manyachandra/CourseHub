@@ -127,22 +127,27 @@ export default function Checkout() {
     try {
       setLoading(true);
       
-      // Create order first
+      // Create order first - send courseIds instead of cartItems
       const orderData = {
-        paymentMethod: 'pending',
-        billingAddress: billingInfo,
-        cartItems: items // Send frontend cart items
+        courseIds: items.map(item => item.courseId._id), // Extract course IDs
+        paymentMethod: 'pending'
       };
       
-      const orderResponse = await ordersAPI.create(orderData);
-      const createdOrder = orderResponse.data.order;
+      console.log('Creating order with data:', orderData);
       
+      const orderResponse = await ordersAPI.create(orderData);
+      console.log('Order created successfully:', orderResponse.data);
+      
+      const createdOrder = orderResponse.data.order;
       setOrder(createdOrder);
       setStep('payment');
       
+      toast.success('Order created successfully! Proceed to payment.');
+      
     } catch (error) {
       console.error('Error creating order:', error);
-      toast.error(error.response?.data?.message || 'Error creating order');
+      console.error('Error response:', error.response?.data);
+      toast.error(error.response?.data?.message || 'Error creating order. Please try again.');
     } finally {
       setLoading(false);
     }

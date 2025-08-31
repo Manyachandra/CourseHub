@@ -29,9 +29,6 @@ const createOrder = async (req, res) => {
       return res.status(400).json({ message: 'Some courses are not available' });
     }
 
-    // Calculate total
-    const total = courses.reduce((sum, course) => sum + course.price, 0);
-
     // Check if user already owns any of these courses
     const existingPurchases = user.purchasedCourses.filter(item => 
       courseIds.includes(item.courseId.toString())
@@ -44,13 +41,16 @@ const createOrder = async (req, res) => {
       });
     }
 
-    // Create order
+    // Create order with proper course structure
     const order = new Order({
       user: userId,
-      courses: courseIds.map(courseId => ({ courseId })),
-      total,
+      courses: courses.map(course => ({
+        course: course._id,
+        price: course.price
+      })),
+      totalAmount: courses.reduce((sum, course) => sum + course.price, 0),
       paymentMethod,
-      status: 'pending'
+      status: 'processing'
     });
 
     await order.save();
