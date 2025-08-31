@@ -25,14 +25,28 @@ const register = async (req, res) => {
     req.session.userRole = user.role;
     req.session.userName = user.name;
 
-    res.status(201).json({
-      message: 'User registered successfully',
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role
+    // Force session save
+    req.session.save((err) => {
+      if (err) {
+        console.error('Session save error:', err);
+        return res.status(500).json({ message: 'Session creation failed' });
       }
+      
+      console.log('Session created successfully:', {
+        sessionID: req.sessionID,
+        userId: req.session.userId,
+        userRole: req.session.userRole
+      });
+
+      res.status(201).json({
+        message: 'User registered successfully',
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role
+        }
+      });
     });
   } catch (error) {
     console.error('Registration error:', error);
@@ -61,15 +75,29 @@ const login = async (req, res) => {
     req.session.userId = user._id;
     req.session.userRole = user.role;
     req.session.userName = user.name;
-
-    res.json({
-      message: 'Login successful',
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role
+    
+    // Force session save
+    req.session.save((err) => {
+      if (err) {
+        console.error('Session save error:', err);
+        return res.status(500).json({ message: 'Session creation failed' });
       }
+      
+      console.log('Session created successfully:', {
+        sessionID: req.sessionID,
+        userId: req.session.userId,
+        userRole: req.session.userRole
+      });
+
+      res.json({
+        message: 'Login successful',
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role
+        }
+      });
     });
   } catch (error) {
     console.error('Login error:', error);

@@ -2,14 +2,13 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Layout from '../components/Layout';
-import { authAPI } from '../utils/api';
 import { useUserStore } from '../utils/store';
 import { FiMail, FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
 export default function Login() {
   const router = useRouter();
-  const { user, setUser } = useUserStore();
+  const { user, login } = useUserStore();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   
@@ -59,14 +58,17 @@ export default function Login() {
 
     try {
       setLoading(true);
-      const response = await authAPI.login(formData);
+      const result = await login(formData);
       
-      setUser(response.data.user);
-      toast.success('Login successful!');
-      
-      // Redirect to intended page or home
-      const redirectTo = router.query.redirect || '/';
-      router.push(redirectTo);
+      if (result.success) {
+        toast.success('Login successful!');
+        
+        // Redirect to intended page or home
+        const redirectTo = router.query.redirect || '/';
+        router.push(redirectTo);
+      } else {
+        toast.error(result.message || 'Login failed');
+      }
     } catch (error) {
       console.error('Login error:', error);
       const errorMessage = error.response?.data?.message || 'Login failed. Please try again.';

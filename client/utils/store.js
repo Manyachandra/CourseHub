@@ -12,6 +12,24 @@ export const useUserStore = create(
       setUser: (user) => set({ user }),
       setLoading: (isLoading) => set({ isLoading }),
       
+      // Login method that handles the entire login flow
+      login: async (credentials) => {
+        try {
+          set({ isLoading: true });
+          const response = await authAPI.login(credentials);
+          if (response.data.user) {
+            set({ user: response.data.user });
+            return { success: true, user: response.data.user };
+          }
+          return { success: false, message: 'Login failed' };
+        } catch (error) {
+          console.error('Login error:', error);
+          return { success: false, message: error.response?.data?.message || 'Login failed' };
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+      
       logout: async () => {
         try {
           await authAPI.logout();
@@ -19,6 +37,10 @@ export const useUserStore = create(
           console.error('Logout error:', error);
         } finally {
           set({ user: null });
+          // Clear localStorage manually to ensure cleanup
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem('user-storage');
+          }
         }
       },
       
