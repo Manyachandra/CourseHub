@@ -63,17 +63,16 @@ export default function CourseDetails() {
       return;
     }
 
-    if (isPurchased) {
-      toast.error('You already own this course!');
-      return;
-    }
-
     try {
       await addItem(course);
       toast.success('Course added to cart!');
     } catch (error) {
       console.error('Error adding to cart:', error);
-      toast.error('Error adding to cart');
+      if (error.message === 'Course already purchased') {
+        toast.error('Already purchased! You already own this course.');
+      } else {
+        toast.error('Error adding to cart');
+      }
     }
   };
 
@@ -85,14 +84,23 @@ export default function CourseDetails() {
       return;
     }
 
+    console.log('=== REVIEW SUBMISSION DEBUG ===');
+    console.log('Course ID:', id);
+    console.log('Review Form:', reviewForm);
+    console.log('User authenticated:', isAuthenticated());
+    console.log('==============================');
+
     try {
-      await coursesAPI.addReview(id, reviewForm);
+      const response = await coursesAPI.addReview(id, reviewForm);
+      console.log('Review submission response:', response);
       toast.success('Review submitted successfully!');
       setReviewForm({ rating: 5, comment: '' });
       fetchCourse(); // Refresh course data to show new review
     } catch (error) {
       console.error('Error submitting review:', error);
-      toast.error(error.response?.data?.message || 'Error submitting review');
+      console.error('Error response:', error.response);
+      console.error('Error message:', error.message);
+      toast.error(error.response?.data?.message || error.message || 'Error submitting review');
     }
   };
 
@@ -477,7 +485,7 @@ export default function CourseDetails() {
                       <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
                         Reviews ({course.reviews?.length || 0})
                       </h3>
-                      {isAuthenticated() && !isPurchased && (
+                      {isAuthenticated() && (
                         <button
                           onClick={() => setShowReviewForm(!showReviewForm)}
                           className="btn btn-outline"
