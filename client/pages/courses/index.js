@@ -50,8 +50,8 @@ export default function Courses() {
     if (filters.price) {
       if (filters.price === 'free' && course.price > 0) return false;
       if (filters.price === 'paid' && course.price === 0) return false;
-      if (filters.price === 'under50' && course.price >= 50) return false;
-      if (filters.price === 'over50' && course.price < 50) return false;
+      if (filters.price === 'under500' && course.price >= 500) return false;
+      if (filters.price === 'over500' && course.price < 500) return false;
     }
     if (filters.search && !course.title.toLowerCase().includes(filters.search.toLowerCase())) return false;
     return true;
@@ -72,7 +72,7 @@ export default function Courses() {
 
   if (error) {
     return (
-      <div className={`min-h-screen transition-colors duration-200 ${theme === 'dark' ? 'dark' : ''}`}>
+      <div className={`min-h-screen transition-colors duration-200 ${theme && theme === 'dark' ? 'dark' : ''}`}>
         <Head>
           <title>All Courses - CourseHub</title>
           <meta name="description" content="Browse all available courses on CourseHub" />
@@ -100,7 +100,7 @@ export default function Courses() {
   }
 
   return (
-    <div className={`min-h-screen transition-colors duration-200 ${theme === 'dark' ? 'dark' : ''}`}>
+    <div className={`min-h-screen transition-colors duration-200 ${theme && theme === 'dark' ? 'dark' : ''}`}>
       <Head>
         <title>All Courses - CourseHub</title>
         <meta name="description" content="Browse all available courses on CourseHub" />
@@ -177,8 +177,8 @@ export default function Courses() {
                 <option value="">All Prices</option>
                 <option value="free">Free</option>
                 <option value="paid">Paid</option>
-                <option value="under50">Under $50</option>
-                <option value="over50">Over $50</option>
+                <option value="under500">Under ₹500</option>
+                <option value="over500">Over ₹500</option>
               </select>
             </div>
 
@@ -236,7 +236,7 @@ export default function Courses() {
                   />
                   <div className="absolute top-4 right-4">
                     <span className="badge-primary px-3 py-1 rounded-full text-sm font-medium">
-                      {course.price === 0 ? 'Free' : `$${course.price}`}
+                      {course.price === 0 ? 'Free' : `₹${course.price}`}
                     </span>
                   </div>
                 </div>
@@ -244,24 +244,24 @@ export default function Courses() {
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-2">
                     <span className="badge-secondary px-2 py-1 rounded text-xs">
-                      {course.category}
+                      {course.category || 'Uncategorized'}
                     </span>
                     <span className="badge-secondary px-2 py-1 rounded text-xs">
-                      {course.level}
+                      {course.level || 'Beginner'}
                     </span>
                   </div>
                   
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2">
-                    {course.title}
+                    {course.title || 'Untitled Course'}
                   </h3>
                   
                   <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-2">
-                    {course.description}
+                    {course.description || 'No description available'}
                   </p>
                   
                   <div className="flex items-center justify-between">
                     <div className="text-sm text-gray-500 dark:text-gray-400">
-                      {course.instructor}
+                      {course.instructor?.name || 'Unknown Instructor'}
                     </div>
                     <Link
                       href={`/courses/${course._id}`}

@@ -90,12 +90,12 @@ export default function Layout({ children }) {
             </nav>
 
             {/* Right side items */}
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-6">
               {/* Theme Toggle */}
               <ThemeToggle />
               
               {/* Cart */}
-              <Link href="/cart" className="relative p-2 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200">
+              <Link href="/cart" className="relative p-2 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200" title="Shopping Cart">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m6 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01" />
                 </svg>
@@ -105,6 +105,9 @@ export default function Layout({ children }) {
                   </span>
                 )}
               </Link>
+
+              {/* Visual Separator */}
+              <div className="w-px h-6 bg-gray-300 dark:bg-gray-600"></div>
 
               {/* User Menu */}
               {user ? (
@@ -183,6 +186,25 @@ export default function Layout({ children }) {
               >
                 Categories
               </Link>
+              {/* Cart Link for Mobile */}
+              <Link 
+                href="/cart" 
+                className="block px-3 py-2 rounded-md text-base font-medium nav-link"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <div className="flex items-center space-x-2">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m6 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01" />
+                  </svg>
+                  <span>Shopping Cart</span>
+                  {safeCartItems.length > 0 && (
+                    <span className="bg-primary-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                      {safeCartItems.length}
+                    </span>
+                  )}
+                </div>
+              </Link>
+
               {user && (
                 <>
                   <Link 
@@ -258,7 +280,7 @@ export default function Layout({ children }) {
                 <span className="text-xl font-bold text-gray-900 dark:text-white">CourseHub</span>
               </div>
               <p className="text-gray-600 dark:text-gray-300 mb-4">
-                Your gateway to knowledge and skill development through high-quality online courses.
+                Your gateway to knowledge and skill development through high-quality online courses. Based in India, serving learners worldwide.
               </p>
             </div>
 
@@ -315,7 +337,7 @@ export default function Layout({ children }) {
           <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
             <div className="flex flex-col md:flex-row justify-between items-center">
               <div className="text-gray-600 dark:text-gray-300 text-sm">
-                © 2024 CourseHub. All rights reserved.
+                © 2024 CourseHub. All rights reserved. | Made in India 🇮🇳
               </div>
               <div className="flex space-x-6 mt-4 md:mt-0">
                 <Link href="/privacy" className="text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 text-sm transition-colors duration-200">

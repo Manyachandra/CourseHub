@@ -158,10 +158,10 @@ export default function Cart() {
                               </button>
                             </div>
 
-                            {/* Price */}
-                            <div className="text-lg font-semibold text-primary-600 dark:text-primary-400">
-                              ${(item.courseId.price * item.quantity).toFixed(2)}
-                            </div>
+                                              {/* Price */}
+                  <div className="text-lg font-semibold text-primary-600 dark:text-primary-400">
+                    ₹{(item.courseId.price * item.quantity).toFixed(2)}
+                  </div>
                           </div>
 
                           {/* Remove Button */}
@@ -195,19 +195,19 @@ export default function Cart() {
                 {/* Subtotal */}
                 <div className="flex justify-between text-gray-600 dark:text-gray-300">
                   <span>Subtotal ({safeCartItems.length} {safeCartItems.length === 1 ? 'course' : 'courses'})</span>
-                  <span>${calculateTotal().toFixed(2)}</span>
+                  <span>₹{calculateTotal().toFixed(2)}</span>
                 </div>
 
                 {/* Tax */}
                 <div className="flex justify-between text-gray-600 dark:text-gray-300">
                   <span>Tax</span>
-                  <span>$0.00</span>
+                  <span>₹0.00</span>
                 </div>
 
                 {/* Total */}
                 <div className="flex justify-between text-lg font-semibold text-gray-900 dark:text-white pt-4 border-t border-gray-200 dark:border-gray-700">
                   <span>Total</span>
-                  <span>${calculateTotal().toFixed(2)}</span>
+                  <span>₹{calculateTotal().toFixed(2)}</span>
                 </div>
 
                 {/* Checkout Button */}

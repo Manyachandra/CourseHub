@@ -30,7 +30,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className={`min-h-screen transition-colors duration-200 ${theme === 'dark' ? 'dark' : ''}`}>
+    <div className={`min-h-screen transition-colors duration-200 ${theme && theme === 'dark' ? 'dark' : ''}`}>
       <Head>
         <title>CourseHub - Your Gateway to Knowledge</title>
         <meta name="description" content="Discover high-quality online courses and enhance your skills with CourseHub" />
