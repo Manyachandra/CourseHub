@@ -53,7 +53,7 @@ export default function Cart() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
           <div className="text-gray-400 dark:text-gray-500 mb-8">
             <svg className="w-24 h-24 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m6 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
             </svg>
           </div>
           
@@ -160,7 +160,7 @@ export default function Cart() {
 
                                               {/* Price */}
                   <div className="text-lg font-semibold text-primary-600 dark:text-primary-400">
-                    ₹{(item.courseId.price * item.quantity).toFixed(2)}
+                    ${(item.courseId.price * item.quantity).toFixed(2)}
                   </div>
                           </div>
 
@@ -195,19 +195,19 @@ export default function Cart() {
                 {/* Subtotal */}
                 <div className="flex justify-between text-gray-600 dark:text-gray-300">
                   <span>Subtotal ({safeCartItems.length} {safeCartItems.length === 1 ? 'course' : 'courses'})</span>
-                  <span>₹{calculateTotal().toFixed(2)}</span>
+                  <span>${calculateTotal().toFixed(2)}</span>
                 </div>
 
                 {/* Tax */}
                 <div className="flex justify-between text-gray-600 dark:text-gray-300">
                   <span>Tax</span>
-                  <span>₹0.00</span>
+                  <span>$0.00</span>
                 </div>
 
                 {/* Total */}
                 <div className="flex justify-between text-lg font-semibold text-gray-900 dark:text-white pt-4 border-t border-gray-200 dark:border-gray-700">
                   <span>Total</span>
-                  <span>₹{calculateTotal().toFixed(2)}</span>
+                  <span>${calculateTotal().toFixed(2)}</span>
                 </div>
 
                 {/* Checkout Button */}

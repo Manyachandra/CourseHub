@@ -493,7 +493,7 @@ export default function Checkout() {
                               </p>
                             </div>
                             <span className="text-sm font-medium text-gray-900 dark:text-white">
-                              ₹${item.courseId.price}
+                              ${item.courseId.price}
                             </span>
                           </div>
                         ))}
