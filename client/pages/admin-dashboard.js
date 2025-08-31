@@ -2,10 +2,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Layout from '../components/Layout';
 import { useUserStore } from '../utils/store';
-import { adminAPI } from '../utils/api';
 import { FiUsers, FiBookOpen, FiShoppingCart, FiTrendingUp, FiPlus, FiEdit2, FiTrash2, FiEye, FiRefreshCw, FiSearch, FiFilter } from 'react-icons/fi';
 import toast from 'react-hot-toast';
-import { authAPI } from '../utils/api'; // Added import for authAPI
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -72,13 +70,19 @@ export default function AdminDashboard() {
 
   // Check authentication and admin role
   useEffect(() => {
-    console.log('=== ADMIN DASHBOARD DEBUG ===');
+    console.log('=== ADMIN DASHBOARD DEBUG START ===');
+    console.log('Component mounted, checking user state...');
     console.log('User object:', user);
+    console.log('User object keys:', user ? Object.keys(user) : 'No user');
     console.log('User type:', typeof user);
     console.log('User role:', user?.role);
     console.log('User ID:', user?._id);
+    console.log('User id (lowercase):', user?.id);
     console.log('Is authenticated:', !!user);
     console.log('User store state:', useUserStore.getState());
+    console.log('LocalStorage user-storage:', typeof window !== 'undefined' ? localStorage.getItem('user-storage') : 'Server side');
+    console.log('Router pathname:', router.pathname);
+    console.log('Router query:', router.query);
     console.log('================================');
     
     if (!user) {
@@ -94,37 +98,13 @@ export default function AdminDashboard() {
       return;
     }
 
-    console.log('User is admin, checking session with backend...');
-    checkSessionAndFetchData();
+    console.log('User is admin, fetching data...');
+    fetchAdminData();
   }, [user, router]);
-
-  // Check if session is valid with backend before fetching admin data
-  const checkSessionAndFetchData = async () => {
-    try {
-      console.log('Checking session validity...');
-      const response = await authAPI.getCurrentUser();
-      console.log('Session check response:', response);
-      
-      if (response.data && response.data.user) {
-        console.log('Session is valid, fetching admin data...');
-        fetchAdminData();
-      } else {
-        console.log('Session is invalid, redirecting to login');
-        router.push('/login');
-      }
-    } catch (error) {
-      console.log('Session check failed:', error);
-      console.log('Redirecting to login due to session failure');
-      router.push('/login');
-    }
-  };
 
   // Fetch admin data with timeout
   const fetchAdminData = async () => {
     try {
-      console.log('=== FETCHING ADMIN DATA ===');
-      console.log('Making API calls to:', process.env.NEXT_PUBLIC_API_URL || '/api');
-      
       setLoading(true);
       setError(null);
       setTimeoutError(false);
@@ -134,38 +114,31 @@ export default function AdminDashboard() {
         setLoading(false);
       }, 10000);
 
-      console.log('Calling admin API endpoints...');
       const [statsRes, coursesRes, usersRes, ordersRes] = await Promise.all([
-        adminAPI.getStats(),
-        adminAPI.getAllCourses(),
-        adminAPI.getAllUsers(),
-        adminAPI.getAllOrders()
+        fetch('/api/admin/stats', { credentials: 'include' }),
+        fetch('/api/admin/courses', { credentials: 'include' }),
+        fetch('/api/admin/users', { credentials: 'include' }),
+        fetch('/api/admin/orders', { credentials: 'include' })
       ]);
-
-      console.log('API responses received:');
-      console.log('Stats response:', statsRes);
-      console.log('Courses response:', coursesRes);
-      console.log('Users response:', usersRes);
-      console.log('Orders response:', ordersRes);
 
       clearTimeout(timeoutId);
 
-      if (statsRes.error || coursesRes.error || usersRes.error || ordersRes.error) {
+      if (!statsRes.ok || !coursesRes.ok || !usersRes.ok || !ordersRes.ok) {
         const errorDetails = {
-          stats: statsRes.error?.response?.status || 'unknown',
-          courses: coursesRes.error?.response?.status || 'unknown',
-          users: usersRes.error?.response?.status || 'unknown',
-          orders: ordersRes.error?.response?.status || 'unknown'
+          stats: statsRes.status,
+          courses: coursesRes.status,
+          users: usersRes.status,
+          orders: ordersRes.status
         };
         console.error('API Response errors:', errorDetails);
         throw new Error(`Failed to fetch admin data: ${JSON.stringify(errorDetails)}`);
       }
 
       const [statsData, coursesData, usersData, ordersData] = await Promise.all([
-        statsRes.data,
-        coursesRes.data,
-        usersRes.data,
-        ordersRes.data
+        statsRes.json(),
+        coursesRes.json(),
+        usersRes.json(),
+        ordersRes.json()
       ]);
 
       setStats(statsData);
@@ -213,7 +186,12 @@ export default function AdminDashboard() {
 
     try {
       const promises = selectedCourses.map(courseId =>
-        adminAPI.toggleCourseStatus(courseId, 'published')
+        fetch(`/api/admin/courses/${courseId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ status: 'published' })
+        })
       );
 
       await Promise.all(promises);
@@ -237,7 +215,10 @@ export default function AdminDashboard() {
 
     try {
       const promises = selectedCourses.map(courseId =>
-        adminAPI.deleteCourse(courseId)
+        fetch(`/api/admin/courses/${courseId}`, { 
+          method: 'DELETE',
+          credentials: 'include'
+        })
       );
 
       await Promise.all(promises);
@@ -258,9 +239,14 @@ export default function AdminDashboard() {
     }
 
     try {
-      const response = await adminAPI.createCourse(newCourse);
+      const response = await fetch('/api/admin/courses', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(newCourse)
+      });
 
-      if (response.error) {
+      if (!response.ok) {
         throw new Error('Failed to create course');
       }
 
@@ -286,9 +272,14 @@ export default function AdminDashboard() {
 
   const handleUpdateOrderStatus = async (orderId, status) => {
     try {
-      const response = await adminAPI.updateOrderStatus(orderId, status);
+      const response = await fetch(`/api/admin/orders/${orderId}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ status })
+      });
 
-      if (response.error) {
+      if (!response.ok) {
         throw new Error('Failed to update order status');
       }
 
@@ -314,9 +305,12 @@ export default function AdminDashboard() {
     if (!courseToDelete) return;
 
     try {
-      const response = await adminAPI.deleteCourse(courseToDelete._id);
+      const response = await fetch(`/api/admin/courses/${courseToDelete._id}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
 
-      if (response.error) {
+      if (!response.ok) {
         throw new Error('Failed to delete course');
       }
 
@@ -332,9 +326,14 @@ export default function AdminDashboard() {
   const handleToggleCourseStatus = async (courseId, currentStatus) => {
     try {
       const newStatus = currentStatus === 'published' ? 'draft' : 'published';
-      const response = await adminAPI.toggleCourseStatus(courseId, newStatus);
+      const response = await fetch(`/api/admin/courses/${courseId}/toggle-status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ status: newStatus })
+      });
 
-      if (response.error) {
+      if (!response.ok) {
         throw new Error('Failed to update course status');
       }
 
@@ -347,14 +346,20 @@ export default function AdminDashboard() {
 
   const handleSaveCourse = async (courseData) => {
     try {
-      let response;
-      if (courseData._id) {
-        response = await adminAPI.updateCourse(courseData._id, courseData);
-      } else {
-        response = await adminAPI.createCourse(courseData);
-      }
+      const url = courseData._id 
+        ? `/api/admin/courses/${courseData._id}`
+        : '/api/admin/courses';
+      
+      const method = courseData._id ? 'PUT' : 'POST';
+      
+      const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(courseData)
+      });
 
-      if (response.error) {
+      if (!response.ok) {
         throw new Error('Failed to save course');
       }
 
