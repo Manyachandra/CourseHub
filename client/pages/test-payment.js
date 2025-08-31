@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { paymentAPI } from '../utils/api';
-import { FiCreditCard, FiPaypal, FiBank, FiCheckCircle, FiXCircle, FiRefreshCw } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import Layout from '../components/Layout';
 
@@ -77,10 +76,30 @@ export default function TestPayment() {
 
   const getMethodIcon = (method) => {
     switch (method) {
-      case 'card': return FiCreditCard;
-      case 'paypal': return FiPaypal;
-      case 'bank_transfer': return FiBank;
-      default: return FiCreditCard;
+      case 'card': 
+        return (
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+          </svg>
+        );
+      case 'paypal': 
+        return (
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+        );
+      case 'bank_transfer': 
+        return (
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+          </svg>
+        );
+      default: 
+        return (
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+          </svg>
+        );
     }
   };
 
@@ -148,7 +167,9 @@ export default function TestPayment() {
                   onClick={fetchPaymentMethods}
                   className="flex items-center px-3 py-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
                 >
-                  <FiRefreshCw className="w-4 h-4 mr-1" />
+                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
                   Refresh
                 </button>
                 <button
@@ -162,7 +183,9 @@ export default function TestPayment() {
 
             {testResults.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
-                <FiCreditCard className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+                <svg className="w-12 h-12 mx-auto mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                </svg>
                 <p>No test results yet. Run a test payment to see results here.</p>
               </div>
             ) : (
@@ -179,9 +202,13 @@ export default function TestPayment() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
                         {result.success ? (
-                          <FiCheckCircle className="w-5 h-5 text-green-600" />
+                          <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
                         ) : (
-                          <FiXCircle className="w-5 h-5 text-red-600" />
+                          <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
                         )}
                         <div>
                           <div className="flex items-center space-x-2">
@@ -265,29 +292,41 @@ export default function TestPayment() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <div className="flex items-center text-sm">
-                  <FiCheckCircle className="w-4 h-4 text-green-600 mr-2" />
+                  <svg className="w-4 h-4 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
                   Mock payment processing
                 </div>
                 <div className="flex items-center text-sm">
-                  <FiCheckCircle className="w-4 h-4 text-green-600 mr-2" />
+                  <svg className="w-4 h-4 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                  </svg>
                   Multiple payment methods
                 </div>
                 <div className="flex items-center text-sm">
-                  <FiCheckCircle className="w-4 h-4 text-green-600 mr-2" />
+                  <svg className="w-4 h-4 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                  </svg>
                   Realistic processing delays
                 </div>
               </div>
               <div className="space-y-2">
                 <div className="flex items-center text-sm">
-                  <FiCheckCircle className="w-4 h-4 text-green-600 mr-2" />
+                  <svg className="w-4 h-4 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
                   95% success rate simulation
                 </div>
                 <div className="flex items-center text-sm">
-                  <FiCheckCircle className="w-4 h-4 text-green-600 mr-2" />
+                  <svg className="w-4 h-4 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                  </svg>
                   Refund processing
                 </div>
                 <div className="flex items-center text-sm">
-                  <FiCheckCircle className="w-4 h-4 text-green-600 mr-2" />
+                  <svg className="w-4 h-4 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                  </svg>
                   Order status updates
                 </div>
               </div>

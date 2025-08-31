@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { useUserStore, useThemeStore } from '../utils/store';
 import Layout from '../components/Layout';
@@ -7,8 +7,11 @@ import '../styles/globals.css';
 export default function App({ Component, pageProps }) {
   const { checkAuth } = useUserStore();
   const { theme, setTheme } = useThemeStore();
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
+    
     // Initialize authentication
     checkAuth();
 
@@ -33,11 +36,31 @@ export default function App({ Component, pageProps }) {
   }, [checkAuth, setTheme]);
 
   useEffect(() => {
-    // Apply theme to document
-    if (typeof window !== 'undefined') {
+    // Apply theme to document only after mounting
+    if (mounted && typeof window !== 'undefined') {
       document.documentElement.classList.toggle('dark', theme === 'dark');
     }
-  }, [theme]);
+  }, [theme, mounted]);
+
+  // Prevent hydration mismatch by not rendering theme-dependent content until mounted
+  if (!mounted) {
+    return (
+      <Layout>
+        <Component {...pageProps} />
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: '#ffffff',
+              color: '#1f2937',
+              border: '1px solid #e5e7eb',
+            },
+          }}
+        />
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
