@@ -4,7 +4,7 @@ const Course = require('../models/Course');
 // Get user's cart
 const getCart = async (req, res) => {
   try {
-    const user = await User.findById(req.session.userId)
+    const user = await User.findById(req.user.id)
       .populate('cart.courseId', 'title price thumbnail instructor duration');
 
     if (!user) {
@@ -22,7 +22,7 @@ const getCart = async (req, res) => {
 const addToCart = async (req, res) => {
   try {
     const { courseId } = req.body;
-    const userId = req.session.userId;
+    const userId = req.user.id;
 
     // Check if course exists
     const course = await Course.findById(courseId);
@@ -74,7 +74,7 @@ const addToCart = async (req, res) => {
 const removeFromCart = async (req, res) => {
   try {
     const { courseId } = req.params;
-    const userId = req.session.userId;
+    const userId = req.user.id;
 
     const user = await User.findById(userId);
     if (!user) {
@@ -101,7 +101,7 @@ const removeFromCart = async (req, res) => {
 // Clear cart
 const clearCart = async (req, res) => {
   try {
-    const userId = req.session.userId;
+    const userId = req.user.id;
 
     const user = await User.findById(userId);
     if (!user) {
@@ -124,7 +124,7 @@ const clearCart = async (req, res) => {
 // Get cart total
 const getCartTotal = async (req, res) => {
   try {
-    const user = await User.findById(req.session.userId)
+    const user = await User.findById(req.user.id)
       .populate('cart.courseId', 'price');
 
     if (!user) {

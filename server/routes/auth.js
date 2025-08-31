@@ -27,18 +27,9 @@ router.get('/google/callback',
 
 // Logout route
 router.get('/logout', (req, res) => {
-  req.logout((err) => {
-    if (err) {
-      return res.status(500).json({ message: 'Error during logout' });
-    }
-    req.session.destroy((err) => {
-      if (err) {
-        return res.status(500).json({ message: 'Error destroying session' });
-      }
-      res.clearCookie('coursehub.sid');
-      res.json({ message: 'Logged out successfully' });
-    });
-  });
+  // With JWT, logout is handled client-side by removing the token
+  // The server just confirms the logout request
+  res.json({ message: 'Logout successful' });
 });
 
 // Protected routes

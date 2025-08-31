@@ -184,7 +184,7 @@ const addReview = async (req, res) => {
   try {
     const { rating, comment } = req.body;
     const courseId = req.params.id;
-    const userId = req.session.userId;
+    const userId = req.user.id;
 
     const course = await Course.findById(courseId);
     if (!course) {

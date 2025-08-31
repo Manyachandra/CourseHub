@@ -120,23 +120,20 @@ const getCurrentUser = async (req, res) => {
   }
 };
 
-// Get user's purchased courses
+// Get purchased courses
 const getPurchasedCourses = async (req, res) => {
   try {
-    const user = await User.findById(req.session.userId)
-      .populate('purchasedCourses.courseId', 'title description thumbnail instructor category level duration price rating')
-      .select('purchasedCourses');
+    const user = await User.findById(req.user.id)
+      .populate('purchasedCourses.courseId', 'title thumbnail instructor duration price');
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    res.json({
-      purchasedCourses: user.purchasedCourses || []
-    });
+    res.json({ purchasedCourses: user.purchasedCourses });
   } catch (error) {
     console.error('Get purchased courses error:', error);
-    res.status(500).json({ message: 'Server error while fetching purchased courses' });
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -144,24 +141,37 @@ const getPurchasedCourses = async (req, res) => {
 const updateProfile = async (req, res) => {
   try {
     const { name, email } = req.body;
-    const updates = {};
+    const userId = req.user.id;
 
-    if (name) updates.name = name;
-    if (email) updates.email = email;
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
 
-    const user = await User.findByIdAndUpdate(
-      req.session.userId,
-      updates,
-      { new: true, runValidators: true }
-    ).select('-password');
+    // Check if email is already taken by another user
+    if (email !== user.email) {
+      const existingUser = await User.findOne({ email });
+      if (existingUser) {
+        return res.status(400).json({ message: 'Email is already taken' });
+      }
+    }
+
+    user.name = name;
+    user.email = email;
+    await user.save();
 
     res.json({
       message: 'Profile updated successfully',
-      user
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+      }
     });
   } catch (error) {
     console.error('Update profile error:', error);
-    res.status(500).json({ message: 'Server error during profile update' });
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
