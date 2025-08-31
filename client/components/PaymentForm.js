@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { paymentAPI } from '../utils/api';
 import toast from 'react-hot-toast';
 
 export default function PaymentForm({ order, onPaymentSuccess, onPaymentFailure }) {
@@ -97,23 +98,14 @@ export default function PaymentForm({ order, onPaymentSuccess, onPaymentFailure 
         paymentDetails: paymentMethod === 'card' ? cardDetails : {}
       };
 
-      const response = await fetch('http://localhost:5000/api/payments/process', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify(paymentData)
-      });
+      const response = await paymentAPI.process(paymentData);
 
-      const result = await response.json();
-
-      if (result.success) {
+      if (response.data.success) {
         toast.success('Payment processed successfully!');
-        onPaymentSuccess && onPaymentSuccess(result);
+        onPaymentSuccess && onPaymentSuccess(response.data);
       } else {
-        toast.error(result.error || 'Payment failed');
-        onPaymentFailure && onPaymentFailure(result);
+        toast.error(response.data.error || 'Payment failed');
+        onPaymentFailure && onPaymentFailure(response.data);
       }
     } catch (error) {
       console.error('Payment error:', error);
