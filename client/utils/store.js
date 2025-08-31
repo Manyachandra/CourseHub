@@ -149,6 +149,16 @@ export const useCartStore = create(
           
           if (!token) return;
           
+          // Check if course is already purchased
+          const userPurchasedCourses = state?.user?.purchasedCourses || [];
+          const isAlreadyPurchased = userPurchasedCourses.some(item => 
+            item.courseId === course._id || item.courseId._id === course._id
+          );
+          
+          if (isAlreadyPurchased) {
+            throw new Error('Course already purchased');
+          }
+          
           // Add to backend first
           const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/cart/add`, {
             method: 'POST',
@@ -170,6 +180,7 @@ export const useCartStore = create(
           }
         } catch (error) {
           console.error('Error adding to cart:', error);
+          throw error; // Re-throw to let component handle it
         }
       },
       
