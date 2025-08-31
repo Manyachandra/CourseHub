@@ -32,10 +32,12 @@ app.use((req, res, next) => {
   console.log('Method:', req.method);
   console.log('Origin:', req.headers.origin);
   console.log('Cookie header:', req.headers.cookie);
+  console.log('All headers:', Object.keys(req.headers));
   console.log('Session ID:', req.sessionID);
   console.log('Session name:', req.session?.name);
   console.log('User in session:', req.session?.user);
   console.log('Session cookie:', req.session?.cookie);
+  console.log('Session exists:', !!req.session);
   console.log('==================');
   next();
 });
@@ -105,7 +107,12 @@ app.get('/api/session-test', (req, res) => {
     hasSession: !!req.session,
     user: req.session?.user,
     cookies: req.headers.cookie,
-    origin: req.headers.origin
+    origin: req.headers.origin,
+    sessionData: {
+      userId: req.session?.userId,
+      userRole: req.session?.userRole,
+      userName: req.session?.userName
+    }
   });
 });
 
