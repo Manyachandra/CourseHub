@@ -84,6 +84,17 @@ export default function CourseDetails() {
       return;
     }
 
+    // Validate review form
+    if (!reviewForm.comment || reviewForm.comment.trim().length < 10) {
+      toast.error('Please provide a comment with at least 10 characters');
+      return;
+    }
+
+    if (!reviewForm.rating || reviewForm.rating < 1 || reviewForm.rating > 5) {
+      toast.error('Please select a valid rating (1-5 stars)');
+      return;
+    }
+
     console.log('=== REVIEW SUBMISSION DEBUG ===');
     console.log('Course ID:', id);
     console.log('Review Form:', reviewForm);
@@ -91,16 +102,35 @@ export default function CourseDetails() {
     console.log('==============================');
 
     try {
-      const response = await coursesAPI.addReview(id, reviewForm);
+      // Prepare review data
+      const reviewData = {
+        rating: parseInt(reviewForm.rating),
+        comment: reviewForm.comment.trim()
+      };
+
+      console.log('Sending review data:', reviewData);
+      
+      const response = await coursesAPI.addReview(id, reviewData);
       console.log('Review submission response:', response);
       toast.success('Review submitted successfully!');
       setReviewForm({ rating: 5, comment: '' });
+      setShowReviewForm(false);
       fetchCourse(); // Refresh course data to show new review
     } catch (error) {
       console.error('Error submitting review:', error);
       console.error('Error response:', error.response);
       console.error('Error message:', error.message);
-      toast.error(error.response?.data?.message || error.message || 'Error submitting review');
+      
+      // Show more specific error messages
+      if (error.response?.status === 400) {
+        toast.error('Validation error: ' + (error.response?.data?.message || 'Please check your input'));
+      } else if (error.response?.status === 401) {
+        toast.error('Please login to submit a review');
+      } else if (error.response?.status === 403) {
+        toast.error('You can only review courses you have purchased');
+      } else {
+        toast.error(error.response?.data?.message || error.message || 'Error submitting review');
+      }
     }
   };
 
@@ -493,6 +523,11 @@ export default function CourseDetails() {
                           Write a Review
                         </button>
                       )}
+                      {/* Debug info */}
+                      <div className="text-xs text-gray-500">
+                        Auth: {isAuthenticated() ? 'Yes' : 'No'} | 
+                        User: {user?.name || 'None'}
+                      </div>
                     </div>
 
                     {/* Review Form */}
