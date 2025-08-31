@@ -1,7 +1,4 @@
 const express = require('express');
-const session = require('express-session');
-const MongoStore = require('connect-mongo');
-const cors = require('cors');
 const passport = require('passport');
 const connectDB = require('./config/database');
 require('dotenv').config();
@@ -17,57 +14,37 @@ try {
   // Continue without database for now
 }
 
-// Middleware
-app.use(cors({
-  origin: [
-    process.env.CLIENT_URL || 'http://localhost:3000'
-  ],
-  credentials: true
-}));
-
-// Debug middleware for sessions
+// Simple request debugging
 app.use((req, res, next) => {
-  console.log('=== REQUEST DEBUG ===');
-  console.log('URL:', req.url);
-  console.log('Method:', req.method);
+  console.log('=== REQUEST ===');
+  console.log(`${req.method} ${req.url}`);
   console.log('Origin:', req.headers.origin);
-  console.log('Cookie header:', req.headers.cookie);
-  console.log('All headers:', Object.keys(req.headers));
-  console.log('Session ID:', req.sessionID);
-  console.log('Session name:', req.session?.name);
-  console.log('User in session:', req.session?.user);
-  console.log('Session cookie:', req.session?.cookie);
-  console.log('Session exists:', !!req.session);
+  console.log('Authorization:', req.headers.authorization ? 'Present' : 'None');
   console.log('==================');
   next();
 });
 
+// Simple headers for cross-origin requests
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+  
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+  
+  next();
+});
+
+// Middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Session configuration
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'your-secret-key',
-  resave: false,
-  saveUninitialized: false,
-  store: MongoStore.create({
-    mongoUrl: process.env.MONGODB_URI || 'mongodb://localhost:27017/course_website',
-    ttl: 24 * 60 * 60 // 1 day
-  }),
-  cookie: {
-    secure: true, // Always use secure in production
-    httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000, // 1 day
-    sameSite: 'none', // Allow cross-site cookies
-    // Remove domain restriction to allow cross-origin cookies
-    path: '/'
-  },
-  name: 'coursehub.sid' // Custom session name
-}));
-
-// Initialize Passport and restore authentication state
+// Initialize Passport
 app.use(passport.initialize());
-app.use(passport.session());
 
 // Import and configure Google OAuth
 require('./config/googleOAuth');
@@ -96,7 +73,27 @@ app.get('/api/test', (req, res) => {
   res.json({ 
     message: 'Server is running!', 
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development'
+    origin: req.headers.origin,
+    auth: req.headers.authorization ? 'Present' : 'None'
+  });
+});
+
+// Auth test route
+app.get('/api/auth-test', (req, res) => {
+  res.json({
+    message: 'Auth endpoint working',
+    origin: req.headers.origin,
+    authorization: req.headers.authorization ? 'Present' : 'None',
+    timestamp: new Date().toISOString()
+  });
+});
+
+// CORS test route
+app.get('/api/cors-test', (req, res) => {
+  res.json({
+    message: 'CORS is working!',
+    origin: req.headers.origin,
+    timestamp: new Date().toISOString()
   });
 });
 

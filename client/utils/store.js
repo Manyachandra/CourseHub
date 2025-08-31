@@ -17,9 +17,11 @@ export const useUserStore = create(
         try {
           set({ isLoading: true });
           const response = await authAPI.login(credentials);
-          if (response.data.user) {
-            set({ user: response.data.user });
-            return { success: true, user: response.data.user };
+          if (response.data.user && response.data.token) {
+            // Store user with token
+            const userWithToken = { ...response.data.user, token: response.data.token };
+            set({ user: userWithToken });
+            return { success: true, user: userWithToken };
           }
           return { success: false, message: 'Login failed' };
         } catch (error) {
@@ -57,7 +59,10 @@ export const useUserStore = create(
           set({ isLoading: true });
           const response = await authAPI.getCurrentUser();
           if (response.data.user) {
-            set({ user: response.data.user });
+            // Preserve the token when updating user data
+            const currentUser = get().user;
+            const userWithToken = { ...response.data.user, token: currentUser?.token };
+            set({ user: userWithToken });
             return true;
           }
           return false;
