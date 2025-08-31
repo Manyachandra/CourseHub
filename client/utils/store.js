@@ -194,7 +194,7 @@ export const useCartStore = create(
             // Handle specific error cases
             if (response.status === 400 && errorData.message) {
               if (errorData.message.includes('already purchased') || errorData.message.includes('already owns')) {
-                throw new Error('Course already purchased');
+                throw new Error(errorData.message); // Use the exact backend message
               }
             }
             
