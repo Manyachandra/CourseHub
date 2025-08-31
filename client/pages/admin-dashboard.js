@@ -5,6 +5,7 @@ import { useUserStore } from '../utils/store';
 import { adminAPI } from '../utils/api';
 import { FiUsers, FiBookOpen, FiShoppingCart, FiTrendingUp, FiPlus, FiEdit2, FiTrash2, FiEye, FiRefreshCw, FiSearch, FiFilter } from 'react-icons/fi';
 import toast from 'react-hot-toast';
+import { authAPI } from '../utils/api'; // Added import for authAPI
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -71,7 +72,14 @@ export default function AdminDashboard() {
 
   // Check authentication and admin role
   useEffect(() => {
-    console.log('Admin Dashboard useEffect - User:', user);
+    console.log('=== ADMIN DASHBOARD DEBUG ===');
+    console.log('User object:', user);
+    console.log('User type:', typeof user);
+    console.log('User role:', user?.role);
+    console.log('User ID:', user?._id);
+    console.log('Is authenticated:', !!user);
+    console.log('User store state:', useUserStore.getState());
+    console.log('================================');
     
     if (!user) {
       console.log('No user found, redirecting to login');
@@ -86,13 +94,37 @@ export default function AdminDashboard() {
       return;
     }
 
-    console.log('User is admin, fetching data...');
-    fetchAdminData();
+    console.log('User is admin, checking session with backend...');
+    checkSessionAndFetchData();
   }, [user, router]);
+
+  // Check if session is valid with backend before fetching admin data
+  const checkSessionAndFetchData = async () => {
+    try {
+      console.log('Checking session validity...');
+      const response = await authAPI.getCurrentUser();
+      console.log('Session check response:', response);
+      
+      if (response.data && response.data.user) {
+        console.log('Session is valid, fetching admin data...');
+        fetchAdminData();
+      } else {
+        console.log('Session is invalid, redirecting to login');
+        router.push('/login');
+      }
+    } catch (error) {
+      console.log('Session check failed:', error);
+      console.log('Redirecting to login due to session failure');
+      router.push('/login');
+    }
+  };
 
   // Fetch admin data with timeout
   const fetchAdminData = async () => {
     try {
+      console.log('=== FETCHING ADMIN DATA ===');
+      console.log('Making API calls to:', process.env.NEXT_PUBLIC_API_URL || '/api');
+      
       setLoading(true);
       setError(null);
       setTimeoutError(false);
@@ -102,12 +134,19 @@ export default function AdminDashboard() {
         setLoading(false);
       }, 10000);
 
+      console.log('Calling admin API endpoints...');
       const [statsRes, coursesRes, usersRes, ordersRes] = await Promise.all([
         adminAPI.getStats(),
         adminAPI.getAllCourses(),
         adminAPI.getAllUsers(),
         adminAPI.getAllOrders()
       ]);
+
+      console.log('API responses received:');
+      console.log('Stats response:', statsRes);
+      console.log('Courses response:', coursesRes);
+      console.log('Users response:', usersRes);
+      console.log('Orders response:', ordersRes);
 
       clearTimeout(timeoutId);
 
