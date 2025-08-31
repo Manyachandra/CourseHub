@@ -7,6 +7,7 @@ import { useThemeStore } from '../../utils/store';
 export default function Courses() {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [filters, setFilters] = useState({
     category: '',
     level: '',
@@ -20,6 +21,9 @@ export default function Courses() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true);
+        setError(null);
+        
         const [coursesRes, categoriesRes, levelsRes] = await Promise.all([
           coursesAPI.getAll(),
           coursesAPI.getCategories(),
@@ -31,6 +35,7 @@ export default function Courses() {
         setLevels(levelsRes.data.levels || []);
       } catch (error) {
         console.error('Error fetching data:', error);
+        setError('Failed to load courses. Please try again later.');
       } finally {
         setLoading(false);
       }
@@ -64,6 +69,35 @@ export default function Courses() {
       search: ''
     });
   };
+
+  if (error) {
+    return (
+      <div className={`min-h-screen transition-colors duration-200 ${theme === 'dark' ? 'dark' : ''}`}>
+        <Head>
+          <title>All Courses - CourseHub</title>
+          <meta name="description" content="Browse all available courses on CourseHub" />
+        </Head>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center py-12">
+            <div className="text-red-500 mb-4">
+              <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Error Loading Courses</h3>
+            <p className="text-gray-600 dark:text-gray-300 mb-4">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="btn-primary px-6 py-2"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`min-h-screen transition-colors duration-200 ${theme === 'dark' ? 'dark' : ''}`}>

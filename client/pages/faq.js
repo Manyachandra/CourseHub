@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import Layout from '../components/Layout';
+import { useThemeStore } from '../utils/store';
 import { FiSearch, FiChevronDown, FiChevronUp, FiHelpCircle, FiBookOpen, FiCreditCard, FiShield, FiUsers } from 'react-icons/fi';
 
 export default function FAQ() {
+  const { theme } = useThemeStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [expandedFaq, setExpandedFaq] = useState(null);
   const [activeCategory, setActiveCategory] = useState('all');
@@ -98,39 +100,38 @@ export default function FAQ() {
     {
       id: 11,
       category: 'billing',
-      question: "Are there any hidden fees?",
-      answer: "No hidden fees! The price you see is the price you pay. There are no additional charges or subscription fees."
+      question: "Do you offer any discounts or promotions?",
+      answer: "Yes, we regularly offer discounts and promotions. Subscribe to our newsletter to stay updated on the latest deals and offers."
     },
     {
       id: 12,
       category: 'security',
       question: "Is my personal information secure?",
-      answer: "Yes, we take security seriously. All personal information is encrypted and stored securely. We never share your data with third parties."
+      answer: "Absolutely. We take data security seriously and use industry-standard encryption to protect your personal information and payment details."
     },
     {
       id: 13,
       category: 'security',
-      question: "How secure are the payment transactions?",
-      answer: "All payment transactions are processed through secure, encrypted channels. We use industry-standard security protocols to protect your financial information."
+      question: "Can I download course materials?",
+      answer: "Yes, most courses include downloadable materials like PDFs, source code, and other resources that you can keep for offline reference."
     },
     {
       id: 14,
       category: 'community',
-      question: "Can I interact with other students?",
-      answer: "Yes! Our platform includes discussion forums, study groups, and community features where you can connect with fellow learners."
+      question: "Is there a community forum?",
+      answer: "Yes, we have an active community forum where students can connect, share experiences, and help each other with their learning journey."
     },
     {
       id: 15,
       category: 'community',
-      question: "Are there study groups or forums?",
-      answer: "Yes, each course has its own discussion forum, and we also have general community forums where students can discuss various topics and form study groups."
+      question: "Can I share my progress with others?",
+      answer: "You can choose to share your learning progress and achievements on social media. We also have leaderboards for friendly competition."
     }
   ];
 
   const filteredFaqs = allFaqs.filter(faq => {
-    const matchesSearch = !searchTerm || 
-      faq.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      faq.answer.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = faq.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         faq.answer.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = activeCategory === 'all' || faq.category === activeCategory;
     return matchesSearch && matchesCategory;
   });
@@ -140,136 +141,127 @@ export default function FAQ() {
   };
 
   return (
-    <Layout>
-      <div className="min-h-screen bg-gray-50">
-        {/* Hero Section */}
-        <section className="bg-gradient-to-r from-primary-600 to-primary-800 text-white py-20">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">Frequently Asked Questions</h1>
-            <p className="text-xl md:text-2xl text-primary-100 max-w-3xl mx-auto">
-              Find answers to the most common questions about CourseHub
-            </p>
-          </div>
-        </section>
-
-        {/* Search Section */}
-        <section className="py-12 bg-white">
+    <div className={`min-h-screen transition-colors duration-200 ${theme === 'dark' ? 'dark' : ''}`}>
+      <Layout>
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="relative">
-              <FiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <input
-                type="text"
-                placeholder="Search for questions or topics..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-lg"
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* Category Filter */}
-        <section className="py-8 bg-gray-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-wrap gap-3 justify-center">
-              {Object.entries(faqCategories).map(([key, category]) => (
-                <button
-                  key={key}
-                  onClick={() => setActiveCategory(key)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                    activeCategory === key
-                      ? 'bg-primary-600 text-white'
-                      : 'bg-white text-gray-700 hover:bg-gray-100'
-                  }`}
-                >
-                  {category.icon}
-                  {category.name}
-                </button>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* FAQ Section */}
-        <section className="py-16 bg-white">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            {/* Header */}
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                {activeCategory === 'all' ? 'All Questions' : `${faqCategories[activeCategory].name} Questions`}
-              </h2>
-              <p className="text-gray-600">
-                {filteredFaqs.length} question{filteredFaqs.length !== 1 ? 's' : ''} found
+              <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Frequently Asked Questions</h1>
+              <p className="text-xl text-gray-600 dark:text-white max-w-3xl mx-auto">
+                Find answers to common questions about CourseHub. Can't find what you're looking for? 
+                <a href="/contact" className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium ml-1">
+                  Contact our support team
+                </a>
               </p>
             </div>
-            
-            {filteredFaqs.length > 0 ? (
-              <div className="space-y-4">
-                {filteredFaqs.map(faq => (
-                  <div key={faq.id} className="border border-gray-200 rounded-lg">
-                    <button
-                      onClick={() => toggleFaq(faq.id)}
-                      className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
-                    >
-                      <span className="font-medium text-gray-900">{faq.question}</span>
-                      {expandedFaq === faq.id ? (
-                        <FiChevronUp className="w-5 h-5 text-gray-500" />
-                      ) : (
-                        <FiChevronDown className="w-5 h-5 text-gray-500" />
-                      )}
-                    </button>
-                    
-                    {expandedFaq === faq.id && (
-                      <div className="px-6 pb-4">
-                        <p className="text-gray-600">{faq.answer}</p>
-                      </div>
-                    )}
-                  </div>
+
+            {/* Search Bar */}
+            <div className="mb-8">
+              <div className="relative max-w-2xl mx-auto">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FiSearch className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Search questions..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="input pl-10 w-full"
+                />
+              </div>
+            </div>
+
+            {/* Category Tabs */}
+            <div className="mb-8">
+              <div className="flex flex-wrap justify-center gap-2">
+                {Object.entries(faqCategories).map(([key, category]) => (
+                  <button
+                    key={key}
+                    onClick={() => setActiveCategory(key)}
+                    className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-colors duration-200 ${
+                      activeCategory === key
+                        ? 'bg-primary-600 text-white'
+                        : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
+                    }`}
+                  >
+                    {category.icon}
+                    <span>{category.name}</span>
+                  </button>
                 ))}
               </div>
-            ) : (
-              <div className="text-center py-12">
-                <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <FiSearch className="w-12 h-12 text-gray-400" />
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">No Questions Found</h3>
-                <p className="text-gray-600 mb-6">
-                  {searchTerm 
-                    ? `No questions found matching "${searchTerm}". Try different keywords.`
-                    : `No questions found in the ${faqCategories[activeCategory].name.toLowerCase()} category.`
-                  }
-                </p>
-                <button
-                  onClick={() => {
-                    setSearchTerm('');
-                    setActiveCategory('all');
-                  }}
-                  className="btn btn-outline"
-                >
-                  View All Questions
-                </button>
-              </div>
-            )}
-          </div>
-        </section>
+            </div>
 
-        {/* Still Need Help */}
-        <section className="py-16 bg-gray-50">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Still Need Help?</h2>
-            <p className="text-lg text-gray-600 mb-8">
-              Can't find the answer you're looking for? Our support team is here to help!
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a href="/contact" className="btn btn-primary px-8 py-3 text-lg">
-                Contact Support
-              </a>
-              <a href="/help" className="btn btn-outline px-8 py-3 text-lg">
-                Visit Help Center
-              </a>
+            {/* FAQ List */}
+            <div className="space-y-4">
+              {filteredFaqs.length === 0 ? (
+                <div className="text-center py-12">
+                  <FiHelpCircle className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No questions found</h3>
+                  <p className="text-gray-600 dark:text-white">
+                    Try adjusting your search terms or category filter.
+                  </p>
+                </div>
+              ) : (
+                filteredFaqs.map((faq) => (
+                  <div key={faq.id} className="card">
+                    <button
+                      onClick={() => toggleFaq(faq.id)}
+                      className="w-full text-left p-6 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-inset"
+                    >
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white pr-4">
+                          {faq.question}
+                        </h3>
+                        <div className="flex-shrink-0">
+                          {expandedFaq === faq.id ? (
+                            <FiChevronUp className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                          ) : (
+                            <FiChevronDown className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                          )}
+                        </div>
+                      </div>
+                      
+                      {expandedFaq === faq.id && (
+                        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                          <p className="text-gray-600 dark:text-white leading-relaxed">
+                            {faq.answer}
+                          </p>
+                        </div>
+                      )}
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Still Need Help Section */}
+            <div className="mt-16 text-center">
+              <div className="bg-white dark:bg-gray-800 rounded-lg p-8 shadow-sm">
+                <FiHelpCircle className="w-16 h-16 text-primary-600 dark:text-primary-400 mx-auto mb-4" />
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Still need help?</h3>
+                <p className="text-gray-600 dark:text-white mb-6 max-w-2xl mx-auto">
+                  Can't find the answer you're looking for? Our support team is here to help you with any questions or concerns.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <a
+                    href="/contact"
+                    className="btn btn-primary px-8 py-3"
+                  >
+                    Contact Support
+                  </a>
+                  <a
+                    href="/help"
+                    className="btn btn-outline px-8 py-3"
+                  >
+                    Visit Help Center
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
-        </section>
-      </div>
-    </Layout>
+        </div>
+      </Layout>
+    </div>
   );
 }

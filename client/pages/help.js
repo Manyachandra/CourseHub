@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import Layout from '../components/Layout';
+import { useThemeStore } from '../utils/store';
 import { FiSearch, FiMessageCircle, FiMail, FiPhone, FiClock, FiHelpCircle, FiChevronDown, FiChevronUp } from 'react-icons/fi';
 
 export default function Help() {
+  const { theme } = useThemeStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [expandedFaq, setExpandedFaq] = useState(null);
 
@@ -59,193 +61,199 @@ export default function Help() {
   };
 
   return (
-    <Layout>
-      <div className="min-h-screen bg-gray-50">
-        {/* Hero Section */}
-        <section className="bg-gradient-to-r from-primary-600 to-primary-800 text-white py-20">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">Help Center</h1>
-            <p className="text-xl md:text-2xl text-primary-100 max-w-3xl mx-auto">
-              Find answers to your questions and get the support you need
-            </p>
-          </div>
-        </section>
-
-        {/* Search Section */}
-        <section className="py-12 bg-white">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="relative">
-              <FiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <input
-                type="text"
-                placeholder="Search for help articles, FAQs, or topics..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-lg"
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* Quick Help Categories */}
-        <section className="py-16 bg-gray-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">Quick Help Categories</h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer">
-                <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mb-4">
-                  <FiHelpCircle className="w-6 h-6 text-primary-600" />
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Getting Started</h3>
-                <p className="text-gray-600 text-sm">
-                  Learn the basics of using CourseHub and taking your first course.
-                </p>
-              </div>
-              
-              <div className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer">
-                <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mb-4">
-                  <FiHelpCircle className="w-6 h-6 text-primary-600" />
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Account & Billing</h3>
-                <p className="text-gray-600 text-sm">
-                  Manage your account settings, billing, and subscription information.
-                </p>
-              </div>
-              
-              <div className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer">
-                <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mb-4">
-                  <FiHelpCircle className="w-6 h-6 text-primary-600" />
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Technical Issues</h3>
-                <p className="text-gray-600 text-sm">
-                  Troubleshoot common technical problems and platform issues.
-                </p>
-              </div>
-              
-              <div className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer">
-                <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mb-4">
-                  <FiHelpCircle className="w-6 h-6 text-primary-600" />
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Course Content</h3>
-                <p className="text-gray-600 text-sm">
-                  Get help with course materials, assignments, and learning resources.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* FAQ Section */}
-        <section className="py-16 bg-white">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">Frequently Asked Questions</h2>
-            
-            <div className="space-y-4">
-              {filteredFaqs.map(faq => (
-                <div key={faq.id} className="border border-gray-200 rounded-lg">
-                  <button
-                    onClick={() => toggleFaq(faq.id)}
-                    className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
-                  >
-                    <span className="font-medium text-gray-900">{faq.question}</span>
-                    {expandedFaq === faq.id ? (
-                      <FiChevronUp className="w-5 h-5 text-gray-500" />
-                    ) : (
-                      <FiChevronDown className="w-5 h-5 text-gray-500" />
-                    )}
-                  </button>
-                  
-                  {expandedFaq === faq.id && (
-                    <div className="px-6 pb-4">
-                      <p className="text-gray-600">{faq.answer}</p>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-            
-            {filteredFaqs.length === 0 && (
-              <div className="text-center py-8">
-                <p className="text-gray-500">No FAQs found matching your search. Try different keywords.</p>
-              </div>
-            )}
-          </div>
-        </section>
-
-        {/* Contact Support */}
-        <section className="py-16 bg-gray-50">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">Still Need Help?</h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <FiMessageCircle className="w-8 h-8 text-primary-600" />
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Live Chat</h3>
-                <p className="text-gray-600 mb-4">
-                  Get instant help from our support team
-                </p>
-                <button className="btn btn-primary">
-                  Start Chat
-                </button>
-              </div>
-              
-              <div className="text-center">
-                <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <FiMail className="w-8 h-8 text-primary-600" />
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Email Support</h3>
-                <p className="text-gray-600 mb-4">
-                  Send us a detailed message
-                </p>
-                <a href="mailto:support@coursehub.com" className="btn btn-outline">
-                  Send Email
-                </a>
-              </div>
-              
-              <div className="text-center">
-                <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <FiPhone className="w-8 h-8 text-primary-600" />
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Phone Support</h3>
-                <p className="text-gray-600 mb-4">
-                  Call us during business hours
-                </p>
-                <a href="tel:+1-800-COURSE" className="btn btn-outline">
-                  Call Now
-                </a>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Support Hours */}
-        <section className="py-16 bg-white">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <div className="bg-primary-50 rounded-lg p-8">
-              <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <FiClock className="w-8 h-8 text-primary-600" />
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Support Hours</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-gray-600">
-                <div>
-                  <p className="font-semibold">Monday - Friday</p>
-                  <p>9:00 AM - 6:00 PM EST</p>
-                </div>
-                <div>
-                  <p className="font-semibold">Saturday - Sunday</p>
-                  <p>10:00 AM - 4:00 PM EST</p>
-                </div>
-              </div>
-              <p className="text-sm text-gray-500 mt-4">
-                For urgent technical issues, we offer 24/7 emergency support
+    <div className={`min-h-screen transition-colors duration-200 ${theme === 'dark' ? 'dark' : ''}`}>
+      <Layout>
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+          {/* Hero Section */}
+          <section className="bg-gradient-to-r from-primary-600 to-primary-800 text-white py-20">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+              <h1 className="text-4xl md:text-6xl font-bold mb-6">Help Center</h1>
+              <p className="text-xl md:text-2xl text-primary-100 max-w-3xl mx-auto">
+                Find answers to your questions and get the support you need
               </p>
             </div>
-          </div>
-        </section>
-      </div>
-    </Layout>
+          </section>
+
+          {/* Search Section */}
+          <section className="py-12 bg-white dark:bg-gray-800">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="relative">
+                <FiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  type="text"
+                  placeholder="Search for help articles, FAQs, or topics..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="input pl-12 w-full text-lg"
+                />
+              </div>
+            </div>
+          </section>
+
+          {/* Quick Help Categories */}
+          <section className="py-16 bg-gray-50 dark:bg-gray-900">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-white text-center mb-12">Quick Help Categories</h2>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+                  <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900 rounded-lg flex items-center justify-center mb-4">
+                    <FiHelpCircle className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Getting Started</h3>
+                  <p className="text-gray-600 dark:text-white text-sm">
+                    Learn the basics of using CourseHub and getting started with your first course.
+                  </p>
+                </div>
+
+                <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+                  <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900 rounded-lg flex items-center justify-center mb-4">
+                    <FiMessageCircle className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Account & Profile</h3>
+                  <p className="text-gray-600 dark:text-white text-sm">
+                    Manage your account settings, profile information, and preferences.
+                  </p>
+                </div>
+
+                <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+                  <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900 rounded-lg flex items-center justify-center mb-4">
+                    <FiMail className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Billing & Payments</h3>
+                  <p className="text-gray-600 dark:text-white text-sm">
+                    Information about payment methods, refunds, and billing questions.
+                  </p>
+                </div>
+
+                <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+                  <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900 rounded-lg flex items-center justify-center mb-4">
+                    <FiPhone className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Technical Support</h3>
+                  <p className="text-gray-600 dark:text-white text-sm">
+                    Get help with technical issues, platform problems, and troubleshooting.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* FAQ Section */}
+          <section className="py-16 bg-white dark:bg-gray-800">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Frequently Asked Questions</h2>
+                <p className="text-lg text-gray-600 dark:text-white">
+                  Quick answers to the most common questions
+                </p>
+              </div>
+              
+              <div className="space-y-4">
+                {filteredFaqs.map((faq) => (
+                  <div key={faq.id} className="card">
+                    <button
+                      onClick={() => toggleFaq(faq.id)}
+                      className="w-full text-left p-6 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-inset"
+                    >
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white pr-4">
+                          {faq.question}
+                        </h3>
+                        <div className="flex-shrink-0">
+                          {expandedFaq === faq.id ? (
+                            <FiChevronUp className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                          ) : (
+                            <FiChevronDown className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                          )}
+                        </div>
+                      </div>
+                      
+                      {expandedFaq === faq.id && (
+                        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                          <p className="text-gray-600 dark:text-white leading-relaxed">
+                            {faq.answer}
+                          </p>
+                        </div>
+                      )}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* Contact Support Section */}
+          <section className="py-16 bg-gray-50 dark:bg-gray-900">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Still Need Help?</h2>
+              <p className="text-lg text-gray-600 dark:text-white mb-8">
+                Can't find what you're looking for? Our support team is here to help!
+              </p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
+                  <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900 rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <FiMail className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Email Support</h3>
+                  <p className="text-gray-600 dark:text-white text-sm mb-3">
+                    Send us an email and we'll respond within 24 hours
+                  </p>
+                  <a
+                    href="mailto:support@coursehub.com"
+                    className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium"
+                  >
+                    support@coursehub.com
+                  </a>
+                </div>
+
+                <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
+                  <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900 rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <FiPhone className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Phone Support</h3>
+                  <p className="text-gray-600 dark:text-white text-sm mb-3">
+                    Call us during business hours for immediate assistance
+                  </p>
+                  <a
+                    href="tel:+1-800-COURSE"
+                    className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium"
+                  >
+                    +1 (800) COURSE
+                  </a>
+                </div>
+
+                <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
+                  <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900 rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <FiClock className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Business Hours</h3>
+                  <p className="text-gray-600 dark:text-white text-sm mb-3">
+                    Monday - Friday<br />
+                    9:00 AM - 6:00 PM EST
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <a
+                  href="/contact"
+                  className="btn btn-primary px-8 py-3"
+                >
+                  Contact Support
+                </a>
+                <a
+                  href="/faq"
+                  className="btn btn-outline px-8 py-3"
+                >
+                  View All FAQs
+                </a>
+              </div>
+            </div>
+          </section>
+        </div>
+      </Layout>
+    </div>
   );
 }

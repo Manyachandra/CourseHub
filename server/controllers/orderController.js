@@ -70,7 +70,7 @@ const getOrderById = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id)
       .populate('user', 'name email')
-      .populate('courses.courseId', 'title price thumbnail instructor');
+      .populate('courses.course', 'title price thumbnail instructor');
 
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
@@ -102,7 +102,7 @@ const getUserOrders = async (req, res) => {
     console.log('User found, searching for orders...');
     
     const orders = await Order.find({ user: req.user.id })
-      .populate('courses.courseId', 'title price thumbnail instructor')
+      .populate('courses.course', 'title price thumbnail instructor')
       .sort({ createdAt: -1 });
 
     console.log('Found orders:', orders.length);
@@ -128,7 +128,7 @@ const getAllOrders = async (req, res) => {
 
     const orders = await Order.find(query)
       .populate('user', 'name email')
-      .populate('courses.courseId', 'title price thumbnail instructor')
+      .populate('courses.course', 'title price thumbnail instructor')
       .sort({ createdAt: -1 })
       .limit(limit * 1)
       .skip((page - 1) * limit);
