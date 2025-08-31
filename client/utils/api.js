@@ -2,6 +2,10 @@ import axios from 'axios';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
 
+// Debug logging
+console.log('API_BASE_URL:', API_BASE_URL);
+console.log('NEXT_PUBLIC_API_URL env var:', process.env.NEXT_PUBLIC_API_URL);
+
 // Create axios instance with default config
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -72,6 +76,30 @@ export const ordersAPI = {
   getById: (id) => api.get(`/orders/${id}`),
   getAll: (params) => api.get('/orders', { params }),
   updateStatus: (id, status) => api.put(`/orders/${id}/status`, { status }),
+};
+
+// Payment API
+export const paymentAPI = {
+  process: (paymentData) => api.post('/payments/process', paymentData),
+  getStatus: (paymentId) => api.get(`/payments/status/${paymentId}`),
+  refund: (paymentId, refundData) => api.post(`/payments/${paymentId}/refund`, refundData),
+  getMethods: () => api.get('/payments/methods'),
+  test: () => api.get('/payments/test'),
+};
+
+// Admin API
+export const adminAPI = {
+  getStats: () => api.get('/admin/stats'),
+  getAllCourses: () => api.get('/admin/courses'),
+  getAllUsers: () => api.get('/admin/users'),
+  getAllOrders: () => api.get('/admin/orders'),
+  createCourse: (courseData) => api.post('/admin/courses', courseData),
+  updateCourse: (id, courseData) => api.put(`/admin/courses/${id}`, courseData),
+  deleteCourse: (id) => api.delete(`/admin/courses/${id}`),
+  toggleCourseStatus: (id, status) => api.patch(`/admin/courses/${id}/toggle-status`, { status }),
+  updateOrderStatus: (id, status) => api.patch(`/admin/orders/${id}/status`, { status }),
+  bulkPublishCourses: (courseIds) => api.patch('/admin/courses/bulk-publish', { courseIds }),
+  bulkDeleteCourses: (courseIds) => api.delete('/admin/courses/bulk-delete', { courseIds }),
 };
 
 export default api;
