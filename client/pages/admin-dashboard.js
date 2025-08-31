@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import Layout from '../components/Layout';
 import { useUserStore, useThemeStore } from '../utils/store';
 import { adminAPI } from '../utils/api';
 import { FiUsers, FiBookOpen, FiShoppingCart, FiTrendingUp, FiPlus, FiEdit2, FiTrash2, FiEye, FiRefreshCw, FiSearch, FiFilter } from 'react-icons/fi';
@@ -358,14 +357,14 @@ export default function AdminDashboard() {
   if (loading && !timeoutError) {
     return (
       <div className={`min-h-screen transition-colors duration-200 ${theme === 'dark' ? 'dark' : ''}`}>
-        <Layout>
+        
           <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
               <p className="text-gray-600 dark:text-white">Loading admin dashboard...</p>
             </div>
           </div>
-        </Layout>
+        
       </div>
     );
   }
@@ -374,7 +373,7 @@ export default function AdminDashboard() {
   if (error) {
     return (
       <div className={`min-h-screen transition-colors duration-200 ${theme === 'dark' ? 'dark' : ''}`}>
-        <Layout>
+        
           <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
             <div className="max-w-md mx-auto text-center">
               <div className="bg-red-100 dark:bg-red-900 border border-red-400 dark:border-red-600 text-red-700 dark:text-red-300 px-4 py-3 rounded mb-4">
@@ -389,7 +388,7 @@ export default function AdminDashboard() {
               </button>
             </div>
           </div>
-        </Layout>
+        
       </div>
     );
   }
@@ -397,7 +396,7 @@ export default function AdminDashboard() {
   if (timeoutError) {
     return (
       <div className={`min-h-screen transition-colors duration-200 ${theme === 'dark' ? 'dark' : ''}`}>
-        <Layout>
+        
           <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
             <div className="max-w-md mx-auto text-center">
               <div className="bg-yellow-100 dark:bg-yellow-900 border border-yellow-400 dark:border-yellow-600 text-yellow-700 dark:text-yellow-300 px-4 py-3 rounded mb-4">
@@ -420,14 +419,14 @@ export default function AdminDashboard() {
               </div>
             </div>
           </div>
-        </Layout>
+        
       </div>
     );
   }
 
   return (
     <div className={`min-h-screen transition-colors duration-200 ${theme === 'dark' ? 'dark' : ''}`}>
-      <Layout>
+      
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         {/* Header */}
         <div className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
@@ -1318,7 +1317,7 @@ export default function AdminDashboard() {
             <FiPlus className="w-6 h-6" />
           </button>
         </div>
-      </Layout>
+      
     </div>
   );
 }

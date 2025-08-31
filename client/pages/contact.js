@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import Layout from '../components/Layout';
 import { useThemeStore } from '../utils/store';
 import { FiMail, FiPhone, FiMapPin, FiClock, FiSend, FiCheckCircle } from 'react-icons/fi';
 import toast from 'react-hot-toast';
@@ -90,32 +89,29 @@ export default function Contact() {
   if (submitted) {
     return (
       <div className={`min-h-screen transition-colors duration-200 ${theme === 'dark' ? 'dark' : ''}`}>
-        <Layout>
-          <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center py-12">
-            <div className="max-w-md w-full text-center">
-              <div className="w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-6">
-                <FiCheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
-              </div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Message Sent Successfully!</h2>
-              <p className="text-gray-600 dark:text-white mb-8">
-                Thank you for contacting us. We'll get back to you within 24 hours.
-              </p>
-              <button
-                onClick={() => setSubmitted(false)}
-                className="btn btn-primary"
-              >
-                Send Another Message
-              </button>
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center py-12">
+          <div className="max-w-md w-full text-center">
+            <div className="w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-6">
+              <FiCheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
             </div>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Message Sent Successfully!</h2>
+            <p className="text-gray-600 dark:text-white mb-8">
+              Thank you for contacting us. We'll get back to you within 24 hours.
+            </p>
+            <button
+              onClick={() => setSubmitted(false)}
+              className="btn btn-primary"
+            >
+              Send Another Message
+            </button>
           </div>
-        </Layout>
+        </div>
       </div>
     );
   }
 
   return (
     <div className={`min-h-screen transition-colors duration-200 ${theme && theme === 'dark' ? 'dark' : ''}`}>
-      <Layout>
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             {/* Header */}
@@ -304,7 +300,6 @@ export default function Contact() {
             </div>
           </div>
         </div>
-      </Layout>
     </div>
   );
 }

@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Layout from '../components/Layout';
 import { useThemeStore } from '../utils/store';
 import { coursesAPI } from '../utils/api';
 import { FiBookOpen, FiUsers, FiClock, FiStar } from 'react-icons/fi';
@@ -73,34 +72,31 @@ export default function Categories() {
   if (loading) {
     return (
       <div className={`min-h-screen transition-colors duration-200 ${theme === 'dark' ? 'dark' : ''}`}>
-        <Layout>
-          <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="animate-pulse">
-                <div className="h-8 bg-gray-300 dark:bg-gray-600 rounded w-1/3 mb-8"></div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {[1, 2, 3, 4, 5, 6].map(i => (
-                    <div key={i} className="card">
-                      <div className="h-48 bg-gray-300 dark:bg-gray-600 rounded-t-lg"></div>
-                      <div className="p-6">
-                        <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded mb-2"></div>
-                        <div className="h-3 bg-gray-300 dark:bg-gray-600 rounded mb-4"></div>
-                        <div className="h-6 bg-gray-300 dark:bg-gray-600 rounded w-20"></div>
-                      </div>
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="animate-pulse">
+              <div className="h-8 bg-gray-300 dark:bg-gray-600 rounded w-1/3 mb-8"></div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[1, 2, 3, 4, 5, 6].map(i => (
+                  <div key={i} className="card">
+                    <div className="h-48 bg-gray-300 dark:bg-gray-600 rounded-t-lg"></div>
+                    <div className="p-6">
+                      <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded mb-2"></div>
+                      <div className="h-3 bg-gray-300 dark:bg-gray-600 rounded mb-4"></div>
+                      <div className="h-6 bg-gray-300 dark:bg-gray-600 rounded w-20"></div>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
-        </Layout>
+        </div>
       </div>
     );
   }
 
   return (
     <div className={`min-h-screen transition-colors duration-200 ${theme === 'dark' ? 'dark' : ''}`}>
-      <Layout>
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             {/* Header */}
@@ -287,7 +283,6 @@ export default function Categories() {
             </div>
           </div>
         </div>
-      </Layout>
     </div>
   );
 }
