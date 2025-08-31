@@ -142,18 +142,32 @@ export const useCartStore = create(
         try {
           // Get JWT token from localStorage
           const userStorage = localStorage.getItem('user-storage');
-          if (!userStorage) return;
+          if (!userStorage) {
+            throw new Error('User not logged in');
+          }
           
           const { state } = JSON.parse(userStorage);
           const token = state?.user?.token;
           
-          if (!token) return;
+          if (!token) {
+            throw new Error('Authentication token not found');
+          }
           
           // Check if course is already purchased
           const userPurchasedCourses = state?.user?.purchasedCourses || [];
-          const isAlreadyPurchased = userPurchasedCourses.some(item => 
-            item.courseId === course._id || item.courseId._id === course._id
-          );
+          console.log('=== CART ADD DEBUG ===');
+          console.log('Course ID:', course._id);
+          console.log('User purchased courses:', userPurchasedCourses);
+          console.log('Checking purchase status...');
+          
+          const isAlreadyPurchased = userPurchasedCourses.some(item => {
+            const matches = item.courseId === course._id || item.courseId._id === course._id;
+            console.log('Item:', item, 'Matches:', matches);
+            return matches;
+          });
+          
+          console.log('Is already purchased:', isAlreadyPurchased);
+          console.log('========================');
           
           if (isAlreadyPurchased) {
             throw new Error('Course already purchased');
@@ -177,6 +191,8 @@ export const useCartStore = create(
             if (!existingItem) {
               set({ items: [...items, { courseId: course, addedAt: new Date(), quantity: 1 }] });
             }
+          } else {
+            throw new Error(`Failed to add to cart: ${response.status}`);
           }
         } catch (error) {
           console.error('Error adding to cart:', error);
