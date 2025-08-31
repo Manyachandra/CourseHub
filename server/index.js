@@ -46,19 +46,53 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Initialize Passport
 app.use(passport.initialize());
 
-// Import and configure Google OAuth
-require('./config/googleOAuth');
+// Import and configure Google OAuth (optional)
+try {
+  require('./config/googleOAuth');
+  console.log('✅ Google OAuth configured');
+} catch (error) {
+  console.log('⚠️ Google OAuth not configured (optional)');
+}
 
 // Routes
 try {
-  app.use('/api/auth', require('./routes/auth'));
-  app.use('/api/courses', require('./routes/courses'));
-  app.use('/api/cart', require('./routes/cart'));
-  app.use('/api/orders', require('./routes/orders'));
-  app.use('/api/payments', require('./routes/payment')); // Payment routes
-  app.use('/api/admin', require('./routes/admin'));
+  console.log('Loading routes...');
+  
+  // Test each route file individually
+  const authRoutes = require('./routes/auth');
+  console.log('✅ Auth routes file loaded');
+  app.use('/api/auth', authRoutes);
+  console.log('✅ Auth routes mounted');
+  
+  const coursesRoutes = require('./routes/courses');
+  console.log('✅ Courses routes file loaded');
+  app.use('/api/courses', coursesRoutes);
+  console.log('✅ Courses routes mounted');
+  
+  const cartRoutes = require('./routes/cart');
+  console.log('✅ Cart routes file loaded');
+  app.use('/api/cart', cartRoutes);
+  console.log('✅ Cart routes mounted');
+  
+  const ordersRoutes = require('./routes/orders');
+  console.log('✅ Orders routes file loaded');
+  app.use('/api/orders', ordersRoutes);
+  console.log('✅ Orders routes mounted');
+  
+  const paymentRoutes = require('./routes/payment');
+  console.log('✅ Payment routes file loaded');
+  app.use('/api/payments', paymentRoutes);
+  console.log('✅ Payment routes mounted');
+  
+  const adminRoutes = require('./routes/admin');
+  console.log('✅ Admin routes file loaded');
+  app.use('/api/admin', adminRoutes);
+  console.log('✅ Admin routes mounted');
+  
+  console.log('🎉 All routes loaded and mounted successfully!');
 } catch (error) {
-  console.error('Error loading routes:', error);
+  console.error('❌ Error loading routes:', error);
+  console.error('Error stack:', error.stack);
 }
 
 // Google OAuth routes (keep these separate)
@@ -84,6 +118,15 @@ app.get('/api/auth-test', (req, res) => {
     message: 'Auth endpoint working',
     origin: req.headers.origin,
     authorization: req.headers.authorization ? 'Present' : 'None',
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Orders test route
+app.get('/api/orders-test', (req, res) => {
+  res.json({
+    message: 'Orders endpoint working',
+    origin: req.headers.origin,
     timestamp: new Date().toISOString()
   });
 });
