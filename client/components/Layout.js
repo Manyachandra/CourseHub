@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useUserStore, useCartStore, useUIStore } from '../utils/store';
+import { useUserStore, useCartStore, useUIStore, useThemeStore } from '../utils/store';
 import { FiMenu, FiX, FiShoppingCart, FiUser, FiLogOut } from 'react-icons/fi';
+import ThemeToggle from './ThemeToggle';
 import toast from 'react-hot-toast';
 
 const Layout = ({ children }) => {
@@ -10,11 +11,19 @@ const Layout = ({ children }) => {
   const { user, logout: logoutUser } = useUserStore();
   const { items } = useCartStore();
   const { sidebarOpen, openSidebar, closeSidebar } = useUIStore();
+  const { theme, setTheme } = useThemeStore();
   
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   // Compute authentication status locally to prevent re-renders
   const isAuthenticated = !!user;
+
+  // Initialize theme on component mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      document.documentElement.classList.toggle('dark', theme === 'dark');
+    }
+  }, [theme]);
 
   const handleLogout = async () => {
     try {
@@ -33,9 +42,9 @@ const Layout = ({ children }) => {
   const cartItemCount = items.length;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
+      <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
@@ -43,33 +52,36 @@ const Layout = ({ children }) => {
               <div className="w-8 h-8 bg-gradient-to-r from-primary-600 to-primary-700 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-lg">C</span>
               </div>
-              <span className="text-xl font-bold text-gray-900">CourseHub</span>
+              <span className="text-xl font-bold text-gray-900 dark:text-white transition-colors duration-200">CourseHub</span>
             </Link>
 
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-8">
-              <Link href="/courses" className="text-gray-600 hover:text-primary-600 transition-colors">
+              <Link href="/courses" className="text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200">
                 Courses
               </Link>
-              <Link href="/categories" className="text-gray-600 hover:text-primary-600 transition-colors">
+              <Link href="/categories" className="text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200">
                 Categories
               </Link>
               {isAuthenticated && (
-                <Link href="/my-courses" className="text-gray-600 hover:text-primary-600 transition-colors">
+                <Link href="/my-courses" className="text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200">
                   My Courses
                 </Link>
               )}
               {isAuthenticated && user?.role === 'admin' && (
-                <Link href="/test-payment" className="text-gray-600 hover:text-primary-600 transition-colors">
+                <Link href="/test-payment" className="text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200">
                   🧪 Test Payment
                 </Link>
               )}
             </nav>
 
-            {/* Right side - Cart, User, Auth */}
+            {/* Right side - Theme Toggle, Cart, User, Auth */}
             <div className="flex items-center space-x-4">
+              {/* Theme Toggle */}
+              <ThemeToggle />
+
               {/* Cart */}
-              <Link href="/cart" className="relative p-2 text-gray-600 hover:text-primary-600 transition-colors">
+              <Link href="/cart" className="relative p-2 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200">
                 <FiShoppingCart className="w-6 h-6" />
                 {cartItemCount > 0 && (
                   <span className="absolute -top-1 -right-1 bg-primary-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
@@ -91,23 +103,23 @@ const Layout = ({ children }) => {
                   </button>
                   
                   {/* Dropdown Menu */}
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                  <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                     <div className="py-2">
-                      <Link href="/profile" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                      <Link href="/profile" className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
                         Profile
                       </Link>
-                      <Link href="/my-orders" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                      <Link href="/my-orders" className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
                         My Orders
                       </Link>
                       {user?.role === 'admin' && (
-                        <Link href="/admin-dashboard" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                        <Link href="/admin-dashboard" className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
                           Admin Dashboard
                         </Link>
                       )}
                       <button
                         onClick={handleLogout}
                         disabled={isLoggingOut}
-                        className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 disabled:opacity-50"
+                        className="w-full text-left px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 transition-colors duration-200"
                       >
                         {isLoggingOut ? 'Logging out...' : 'Logout'}
                       </button>
@@ -116,7 +128,7 @@ const Layout = ({ children }) => {
                 </div>
               ) : (
                 <div className="flex items-center space-x-3">
-                  <Link href="/login" className="btn btn-outline">
+                  <Link href="/login" className="btn btn-outline dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:border-gray-500">
                     Login
                   </Link>
                   <Link href="/register" className="btn btn-primary">
@@ -128,7 +140,7 @@ const Layout = ({ children }) => {
               {/* Mobile menu button */}
               <button
                 onClick={openSidebar}
-                className="md:hidden p-2 text-gray-600 hover:text-primary-600 transition-colors"
+                className="md:hidden p-2 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200"
               >
                 <FiMenu className="w-6 h-6" />
               </button>
@@ -141,41 +153,41 @@ const Layout = ({ children }) => {
       {sidebarOpen && (
         <div className="fixed inset-0 z-50 md:hidden">
           <div className="fixed inset-0 bg-black bg-opacity-50" onClick={closeSidebar} />
-          <div className="fixed right-0 top-0 h-full w-64 bg-white shadow-xl">
-            <div className="flex items-center justify-between p-4 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-900">Menu</h2>
+          <div className="fixed right-0 top-0 h-full w-64 bg-white dark:bg-gray-800 shadow-xl transition-colors duration-200">
+            <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Menu</h2>
               <button
                 onClick={closeSidebar}
-                className="p-2 text-gray-600 hover:text-primary-600 transition-colors"
+                className="p-2 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200"
               >
                 <FiX className="w-6 h-6" />
               </button>
             </div>
             
             <nav className="p-4 space-y-4">
-              <Link href="/courses" className="block text-gray-600 hover:text-primary-600 transition-colors">
+              <Link href="/courses" className="block text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200">
                 Courses
               </Link>
-              <Link href="/categories" className="block text-gray-600 hover:text-primary-600 transition-colors">
+              <Link href="/categories" className="block text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200">
                 Categories
               </Link>
               {isAuthenticated && (
                 <>
-                  <Link href="/my-courses" className="block text-gray-600 hover:text-primary-600 transition-colors">
+                  <Link href="/my-courses" className="block text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200">
                     My Courses
                   </Link>
-                  <Link href="/profile" className="block text-gray-600 hover:text-primary-600 transition-colors">
+                  <Link href="/profile" className="block text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200">
                     Profile
                   </Link>
-                  <Link href="/my-orders" className="block text-gray-600 hover:text-primary-600 transition-colors">
+                  <Link href="/my-orders" className="block text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200">
                     My Orders
                   </Link>
                   {user?.role === 'admin' && (
                     <>
-                      <Link href="/admin-dashboard" className="block text-gray-600 hover:text-primary-600 transition-colors">
+                      <Link href="/admin-dashboard" className="block text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200">
                         Admin Dashboard
                       </Link>
-                      <Link href="/test-payment" className="block text-gray-600 hover:text-primary-600 transition-colors">
+                      <Link href="/test-payment" className="block text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200">
                         🧪 Test Payment
                       </Link>
                     </>
@@ -183,7 +195,7 @@ const Layout = ({ children }) => {
                   <button
                     onClick={handleLogout}
                     disabled={isLoggingOut}
-                    className="w-full text-left text-gray-600 hover:text-primary-600 transition-colors disabled:opacity-50"
+                    className="w-full text-left text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200 disabled:opacity-50"
                   >
                     {isLoggingOut ? 'Logging out...' : 'Logout'}
                   </button>

@@ -196,3 +196,36 @@ export const useUIStore = create((set) => ({
   openModal: (type, data = null) => set({ modalOpen: true, modalType: type, modalData: data }),
   closeModal: () => set({ modalOpen: false, modalType: null, modalData: null }),
 }));
+
+// Theme store
+export const useThemeStore = create(
+  persist(
+    (set, get) => ({
+      theme: 'light', // 'light' or 'dark'
+      
+      toggleTheme: () => {
+        const currentTheme = get().theme;
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        set({ theme: newTheme });
+        
+        // Apply theme to document
+        if (typeof window !== 'undefined') {
+          document.documentElement.classList.toggle('dark', newTheme === 'dark');
+        }
+      },
+      
+      setTheme: (theme) => {
+        set({ theme });
+        if (typeof window !== 'undefined') {
+          document.documentElement.classList.toggle('dark', theme === 'dark');
+        }
+      },
+      
+      isDark: () => get().theme === 'dark',
+    }),
+    {
+      name: 'theme-storage',
+      partialize: (state) => ({ theme: state.theme }),
+    }
+  )
+);
