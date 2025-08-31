@@ -1,12 +1,12 @@
 import Layout from '../components/Layout';
 import { useThemeStore } from '../utils/store';
-import { FiFileText, FiCheckCircle, FiAlertTriangle, FiGavel } from 'react-icons/fi';
+import { FiFileText, FiCheckCircle, FiAlertTriangle } from 'react-icons/fi';
 
 export default function Terms() {
   const { theme } = useThemeStore();
 
   return (
-    <div className={`min-h-screen transition-colors duration-200 ${theme === 'dark' ? 'dark' : ''}`}>
+    <div className={`min-h-screen transition-colors duration-200 ${theme && theme === 'dark' ? 'dark' : ''}`}>
       <Layout>
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
           {/* Hero Section */}
@@ -28,7 +28,7 @@ export default function Terms() {
                     <FiFileText className="w-8 h-8 text-primary-600 dark:text-primary-400" />
                   </div>
                   <p className="text-gray-600 dark:text-white">
-                    Last updated: {new Date().toLocaleDateString()}
+                    Last updated: {new Date().toLocaleDateString() || 'January 2024'}
                   </p>
                 </div>
 
@@ -242,7 +242,9 @@ export default function Terms() {
                 
                 <div className="text-center">
                   <div className="w-16 h-16 bg-primary-100 dark:bg-primary-900 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <FiGavel className="w-8 h-8 text-primary-600 dark:text-primary-400" />
+                    <svg className="w-8 h-8 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
                   </div>
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Account Security</h3>
                   <p className="text-gray-600 dark:text-white text-sm">
