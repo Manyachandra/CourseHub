@@ -133,11 +133,15 @@ export default function PaymentForm({ order, onPaymentSuccess, onPaymentFailure 
           <div className="space-y-1 text-sm text-gray-600">
             <div className="flex justify-between">
               <span>Total Amount:</span>
-              <span className="font-semibold text-gray-900">${order.totalAmount}</span>
+              <span className="font-semibold text-gray-900">
+                ${order?.totalAmount ? order.totalAmount.toFixed(2) : '0.00'}
+              </span>
             </div>
             <div className="flex justify-between">
               <span>Order ID:</span>
-              <span className="font-mono text-xs">#{order._id.slice(-8)}</span>
+              <span className="font-mono text-xs">
+                #{order?._id ? order._id.slice(-8) : 'N/A'}
+              </span>
             </div>
           </div>
         </div>
@@ -252,7 +256,7 @@ export default function PaymentForm({ order, onPaymentSuccess, onPaymentFailure 
                   Processing Payment...
                 </div>
               ) : (
-                `Pay $${order.totalAmount}`
+                `Pay $${order?.totalAmount ? order.totalAmount.toFixed(2) : '0.00'}`
               )}
             </button>
           </form>
