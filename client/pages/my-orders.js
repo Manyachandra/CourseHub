@@ -5,6 +5,7 @@ import { useUserStore, useThemeStore } from '../utils/store';
 import { ordersAPI } from '../utils/api';
 import { FiPackage, FiCalendar, FiDollarSign, FiCheckCircle, FiClock, FiXCircle } from 'react-icons/fi';
 import toast from 'react-hot-toast';
+import Pagination from '../components/Pagination';
 
 export default function MyOrders() {
   const router = useRouter();
@@ -13,6 +14,7 @@ export default function MyOrders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     if (!user) {
@@ -63,6 +65,18 @@ export default function MyOrders() {
       default:
         return <FiPackage className="w-4 h-4" />;
     }
+  };
+
+  // Pagination logic
+  const itemsPerPage = 12;
+  const totalPages = Math.ceil(orders.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentOrders = orders.slice(startIndex, endIndex);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   if (!user) {
@@ -138,7 +152,7 @@ export default function MyOrders() {
               </div>
             ) : (
               <div className="space-y-6">
-                {orders.map((order) => (
+                {currentOrders.map((order) => (
                   <div key={order._id} className="card">
                     <div className="p-6">
                       <div className="flex items-center justify-between mb-4">
@@ -234,6 +248,19 @@ export default function MyOrders() {
                     </div>
                   </div>
                 ))}
+              </div>
+            )}
+
+            {/* Pagination */}
+            {orders.length > 0 && (
+              <div className="mt-8">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                  totalItems={orders.length}
+                  itemsPerPage={itemsPerPage}
+                />
               </div>
             )}
           </div>

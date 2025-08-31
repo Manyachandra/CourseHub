@@ -4,6 +4,7 @@ import { useUserStore, useThemeStore } from '../utils/store';
 import { adminAPI } from '../utils/api';
 import { FiUsers, FiBookOpen, FiShoppingCart, FiTrendingUp, FiPlus, FiEdit2, FiTrash2, FiEye, FiRefreshCw, FiSearch, FiFilter } from 'react-icons/fi';
 import toast from 'react-hot-toast';
+import Pagination from '../components/Pagination';
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -39,6 +40,11 @@ export default function AdminDashboard() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [selectedCourses, setSelectedCourses] = useState([]);
+
+  // Pagination states
+  const [coursesPage, setCoursesPage] = useState(1);
+  const [usersPage, setUsersPage] = useState(1);
+  const [ordersPage, setOrdersPage] = useState(1);
 
   // Form states
   const [newCourse, setNewCourse] = useState({
@@ -163,6 +169,30 @@ export default function AdminDashboard() {
     const matchesStatus = filterStatus === 'all' || course.status === filterStatus;
     return matchesSearch && matchesStatus;
   });
+
+  // Pagination logic for courses
+  const itemsPerPage = 12;
+  const coursesTotalPages = Math.ceil(filteredCourses.length / itemsPerPage);
+  const coursesStartIndex = (coursesPage - 1) * itemsPerPage;
+  const coursesEndIndex = coursesStartIndex + itemsPerPage;
+  const currentCourses = filteredCourses.slice(coursesStartIndex, coursesEndIndex);
+
+  // Pagination logic for users
+  const usersTotalPages = Math.ceil(users.length / itemsPerPage);
+  const usersStartIndex = (usersPage - 1) * itemsPerPage;
+  const usersEndIndex = usersStartIndex + itemsPerPage;
+  const currentUsers = users.slice(usersStartIndex, usersEndIndex);
+
+  // Pagination logic for orders
+  const ordersTotalPages = Math.ceil(orders.length / itemsPerPage);
+  const ordersStartIndex = (ordersPage - 1) * itemsPerPage;
+  const ordersEndIndex = ordersStartIndex + itemsPerPage;
+  const currentOrders = orders.slice(ordersStartIndex, ordersEndIndex);
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCoursesPage(1);
+  }, [searchTerm, filterStatus]);
 
   const handleSelectAll = () => {
     if (selectedCourses.length === filteredCourses.length) {
@@ -455,7 +485,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Tabs */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="border-b border-gray-200 dark:border-gray-700 mb-6">
             <nav className="-mb-px flex space-x-8">
               {[
@@ -485,7 +515,7 @@ export default function AdminDashboard() {
 
           {/* Tab Content */}
           {activeTab === 'overview' && (
-            <div className="space-y-6">
+            <div className="space-y-8 py-6">
               {/* Quick Stats Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
@@ -656,7 +686,7 @@ export default function AdminDashboard() {
 
           {/* Courses Tab */}
           {activeTab === 'courses' && (
-            <div className="space-y-6">
+            <div className="space-y-6 py-4">
               {/* Search and Filters */}
               <div className="flex flex-col sm:flex-row gap-4">
                 <div className="flex-1">
@@ -784,7 +814,7 @@ export default function AdminDashboard() {
                         </tr>
                       </thead>
                       <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                        {filteredCourses.map(course => (
+                        {currentCourses.map(course => (
                           <tr key={course._id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                             <td className="px-6 py-4 whitespace-nowrap">
                               <input
@@ -817,7 +847,11 @@ export default function AdminDashboard() {
                                 className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full cursor-pointer transition-colors ${
                                   course.status === 'published' 
                                     ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 hover:bg-green-200 dark:hover:bg-green-800' 
-                                    : 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 hover:bg-yellow-200 dark:hover:bg-yellow-800'
+                                    : course.status === 'draft'
+                                    ? 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
+                                    : course.status === 'pending'
+                                    ? 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 hover:bg-yellow-200 dark:hover:bg-yellow-800'
+                                    : 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 hover:bg-red-200 dark:hover:bg-red-800'
                                 }`}
                                 title={`Click to ${course.status === 'published' ? 'unpublish' : 'publish'}`}
                               >
@@ -855,14 +889,28 @@ export default function AdminDashboard() {
                       </tbody>
                     </table>
                   </div>
+
                 )}
               </div>
+
+              {/* Pagination for Courses */}
+              {filteredCourses.length > 0 && (
+                <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+                  <Pagination
+                    currentPage={coursesPage}
+                    totalPages={coursesTotalPages}
+                    onPageChange={setCoursesPage}
+                    totalItems={filteredCourses.length}
+                    itemsPerPage={itemsPerPage}
+                  />
+                </div>
+              )}
             </div>
           )}
 
           {/* Users Tab */}
           {activeTab === 'users' && (
-            <div className="space-y-6">
+            <div className="space-y-6 py-4">
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
                 <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Users ({users.length})</h3>
@@ -885,7 +933,7 @@ export default function AdminDashboard() {
                         </tr>
                       </thead>
                       <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                        {users.map(user => (
+                        {currentUsers.map(user => (
                           <tr key={user._id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                             <td className="px-6 py-4 whitespace-nowrap">
                               <div className="flex items-center">
@@ -931,13 +979,26 @@ export default function AdminDashboard() {
                     </table>
                   </div>
                 )}
+
+                {/* Pagination for Users */}
+                {users.length > 0 && (
+                  <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+                    <Pagination
+                      currentPage={usersPage}
+                      totalPages={usersTotalPages}
+                      onPageChange={setUsersPage}
+                      totalItems={users.length}
+                      itemsPerPage={itemsPerPage}
+                    />
+                  </div>
+                )}
               </div>
             </div>
           )}
 
           {/* Orders Tab */}
           {activeTab === 'orders' && (
-            <div className="space-y-6">
+            <div className="space-y-6 py-4">
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
                 <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Orders ({orders.length})</h3>
@@ -962,7 +1023,7 @@ export default function AdminDashboard() {
                         </tr>
                       </thead>
                       <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                        {orders.map(order => (
+                        {currentOrders.map(order => (
                           <tr key={order._id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                             <td className="px-6 py-4 whitespace-nowrap">
                               <div className="text-sm font-medium text-gray-900 dark:text-white">#{order._id.slice(-8)}</div>
@@ -978,7 +1039,7 @@ export default function AdminDashboard() {
                               <div className="text-sm font-medium text-gray-900 dark:text-white">{order.course?.title || 'Unknown Course'}</div>
                               <div className="text-sm text-gray-500 dark:text-gray-400">{order.course?.instructor?.name || 'Unknown Instructor'}</div>
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">${order.amount}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">${order.totalAmount || 0}</td>
                             <td className="px-6 py-4 whitespace-nowrap">
                               <select
                                 value={order.status}
@@ -1009,6 +1070,19 @@ export default function AdminDashboard() {
                         ))}
                       </tbody>
                     </table>
+                  </div>
+                )}
+
+                {/* Pagination for Orders */}
+                {orders.length > 0 && (
+                  <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+                    <Pagination
+                      currentPage={ordersPage}
+                      totalPages={ordersTotalPages}
+                      onPageChange={setOrdersPage}
+                      totalItems={orders.length}
+                      itemsPerPage={itemsPerPage}
+                    />
                   </div>
                 )}
               </div>
@@ -1274,7 +1348,7 @@ export default function AdminDashboard() {
                     <h4 className="font-medium mb-2 text-gray-900 dark:text-white">Course Information</h4>
                     <p className="text-gray-900 dark:text-white"><span className="font-medium">Title:</span> {selectedOrder.course?.title || 'Unknown Course'}</p>
                     <p className="text-gray-900 dark:text-white"><span className="font-medium">Instructor:</span> {selectedOrder.course?.instructor?.name || 'Unknown'}</p>
-                    <p className="text-gray-900 dark:text-white"><span className="font-medium">Amount:</span> ${selectedOrder.amount}</p>
+                    <p className="text-gray-900 dark:text-white"><span className="font-medium">Amount:</span> ${selectedOrder.totalAmount || 0}</p>
                   </div>
                   
                   {selectedOrder.billingAddress && (

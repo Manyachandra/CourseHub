@@ -2,26 +2,90 @@ import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useCartStore } from '../../utils/store';
+import { useCartStore, useUserStore } from '../../utils/store';
 import { useThemeStore } from '../../utils/store';
 import toast from 'react-hot-toast';
+import Pagination from '../../components/Pagination';
 
 export default function Cart() {
   const router = useRouter();
   const { items: cartItems = [], removeFromCart, updateQuantity, clearCart, syncCart } = useCartStore();
   const { theme } = useThemeStore();
+  const { user, isAuthenticated } = useUserStore();
   const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Ensure cartItems is always an array to prevent SSR errors
   const safeCartItems = Array.isArray(cartItems) ? cartItems : [];
 
-  // Sync cart with backend on component mount
+  // Check authentication and redirect if not logged in
   useEffect(() => {
-    syncCart();
-  }, [syncCart]);
+    if (typeof window !== 'undefined' && !isAuthenticated()) {
+      router.push('/login');
+      return;
+    }
+  }, [isAuthenticated, router]);
+
+  // Sync cart with backend on component mount (only if authenticated)
+  useEffect(() => {
+    if (isAuthenticated()) {
+      syncCart();
+    }
+  }, [syncCart, isAuthenticated]);
+
+  // Debug cart data
+  useEffect(() => {
+    console.log('Cart items updated:', safeCartItems);
+    if (safeCartItems.length > 0) {
+      console.log('First cart item structure:', safeCartItems[0]);
+      console.log('First cart item course:', safeCartItems[0]?.courseId);
+    }
+  }, [safeCartItems]);
+
+  // Show loading while checking authentication
+  if (typeof window !== 'undefined' && !isAuthenticated()) {
+    return (
+      <div className={`min-h-screen transition-colors duration-200 ${theme === 'dark' ? 'dark' : ''}`}>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-300">Checking authentication...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show loading while syncing cart
+  if (loading) {
+    return (
+      <div className={`min-h-screen transition-colors duration-200 ${theme === 'dark' ? 'dark' : ''}`}>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-300">Loading your cart...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Pagination logic
+  const itemsPerPage = 12;
+  const totalPages = Math.ceil(safeCartItems.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentCartItems = safeCartItems.slice(startIndex, endIndex);
 
   const calculateTotal = () => {
-    return safeCartItems.reduce((total, item) => total + (item.courseId.price * item.quantity), 0);
+    console.log('Cart items for total calculation:', safeCartItems);
+    return safeCartItems.reduce((total, item) => {
+      const price = item.courseId?.price || 0;
+      const quantity = 1; // Backend doesn't store quantity, always 1
+      console.log(`Item: ${item.courseId?.title}, Price: ${price}, Quantity: ${quantity}`);
+      return total + (price * quantity);
+    }, 0);
+  };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleQuantityChange = (itemId, newQuantity) => {
@@ -29,14 +93,22 @@ export default function Cart() {
     updateQuantity(itemId, newQuantity);
   };
 
-  const handleRemoveItem = (itemId) => {
-    removeFromCart(itemId);
-    toast.success('Item removed from cart');
+  const handleRemoveItem = async (itemId) => {
+    try {
+      await removeFromCart(itemId);
+      toast.success('Item removed from cart');
+    } catch (error) {
+      toast.error('Error removing item from cart');
+    }
   };
 
-  const handleClearCart = () => {
-    clearCart();
-    toast.success('Cart cleared');
+  const handleClearCart = async () => {
+    try {
+      await clearCart();
+      toast.success('Cart cleared');
+    } catch (error) {
+      toast.error('Error clearing cart');
+    }
   };
 
   const handleCheckout = () => {
@@ -118,8 +190,8 @@ export default function Cart() {
               </div>
 
               <div className="divide-y divide-gray-200 dark:divide-gray-700">
-                {safeCartItems.map((item) => (
-                  <div key={item.id} className="p-6">
+                {currentCartItems.map((item) => (
+                  <div key={item.courseId._id} className="p-6">
                     <div className="flex items-start space-x-4">
                       {/* Course Image */}
                       <div className="flex-shrink-0">
@@ -146,33 +218,21 @@ export default function Cart() {
                           <div className="flex items-center space-x-4">
                             {/* Quantity Controls */}
                             <div className="flex items-center space-x-2">
-                              <button
-                                onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
-                                className="w-8 h-8 rounded-full border border-gray-300 dark:border-gray-600 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
-                              >
-                                -
-                              </button>
-                              <span className="w-8 text-center text-gray-900 dark:text-white font-medium">
-                                {item.quantity}
+                              <span className="text-sm text-gray-600 dark:text-gray-400">
+                                Quantity: 1
                               </span>
-                              <button
-                                onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
-                                className="w-8 h-8 rounded-full border border-gray-300 dark:border-gray-600 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
-                              >
-                                +
-                              </button>
                             </div>
 
                                               {/* Price */}
                   <div className="text-lg font-semibold text-primary-600 dark:text-primary-400">
-                    ${(item.courseId.price * item.quantity).toFixed(2)}
+                    ${((item.courseId?.price || 0) * 1).toFixed(2)}
                   </div>
                           </div>
 
                           {/* Remove Button */}
                           <button
-                            onClick={() => handleRemoveItem(item.id)}
-                            className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors duration-200"
+                            onClick={() => handleRemoveItem(item.courseId._id)}
+                            className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-700 transition-colors duration-200"
                           >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -184,6 +244,19 @@ export default function Cart() {
                   </div>
                 ))}
               </div>
+
+              {/* Pagination */}
+              {safeCartItems.length > 0 && (
+                <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                    totalItems={safeCartItems.length}
+                    itemsPerPage={itemsPerPage}
+                  />
+                </div>
+              )}
             </div>
           </div>
 

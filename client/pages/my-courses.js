@@ -5,6 +5,7 @@ import { useUserStore, useThemeStore } from '../utils/store';
 import { authAPI } from '../utils/api';
 import { FiBookOpen, FiPlay, FiClock, FiStar, FiDownload, FiTrendingUp } from 'react-icons/fi';
 import toast from 'react-hot-toast';
+import Pagination from '../components/Pagination';
 
 export default function MyCourses() {
   const router = useRouter();
@@ -14,6 +15,7 @@ export default function MyCourses() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [purchasedCourses, setPurchasedCourses] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const fetchPurchasedCourses = useCallback(async () => {
     try {
@@ -48,6 +50,24 @@ export default function MyCourses() {
     const matchesCategory = !selectedCategory || courseData.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
+
+  // Pagination logic
+  const itemsPerPage = 12;
+  const totalPages = Math.ceil(filteredCourses.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentCourses = filteredCourses.slice(startIndex, endIndex);
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, selectedCategory]);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    // Scroll to top when page changes
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const getProgressPercentage = (course) => {
     // Mock progress - in a real app, this would come from the backend
@@ -160,7 +180,7 @@ export default function MyCourses() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredCourses.map((course) => {
+                {currentCourses.map((course) => {
                   const courseData = course.courseId;
                   if (!courseData) return null;
                   
@@ -230,6 +250,19 @@ export default function MyCourses() {
                     </div>
                   );
                 })}
+              </div>
+            )}
+
+            {/* Pagination */}
+            {filteredCourses.length > 0 && (
+              <div className="mt-8">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                  totalItems={filteredCourses.length}
+                  itemsPerPage={itemsPerPage}
+                />
               </div>
             )}
           </div>
