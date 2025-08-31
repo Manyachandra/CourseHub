@@ -19,7 +19,9 @@ try {
 
 // Middleware
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:3000',
+  origin: [
+    process.env.CLIENT_URL || 'http://localhost:3000'
+  ],
   credentials: true
 }));
 
@@ -53,7 +55,7 @@ app.use(session({
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000, // 1 day
     sameSite: 'none', // Allow cross-site cookies
-    domain: '.vercel.app', // Allow sharing across vercel.app subdomains
+    // Remove domain restriction to allow cross-origin cookies
     path: '/'
   }
 }));
