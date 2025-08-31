@@ -1,18 +1,19 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
+import Head from 'next/head';
 import Link from 'next/link';
-import Layout from '../components/Layout';
 import { coursesAPI } from '../utils/api';
-import { FiPlay, FiUsers, FiStar, FiClock } from 'react-icons/fi';
+import { useThemeStore } from '../utils/store';
 
 export default function Home() {
   const [featuredCourses, setFeaturedCourses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { theme } = useThemeStore();
 
   useEffect(() => {
     const fetchFeaturedCourses = async () => {
       try {
-        const response = await coursesAPI.getAll({ featured: true, limit: 6 });
-        setFeaturedCourses(response.data.courses);
+        const response = await coursesAPI.getFeatured();
+        setFeaturedCourses(response.data.courses || []);
       } catch (error) {
         console.error('Error fetching featured courses:', error);
       } finally {
@@ -24,141 +25,151 @@ export default function Home() {
   }, []);
 
   return (
-    <Layout>
+    <div className={`min-h-screen transition-colors duration-200 ${theme === 'dark' ? 'dark' : ''}`}>
+      <Head>
+        <title>CourseHub - Your Gateway to Knowledge</title>
+        <meta name="description" content="Discover high-quality online courses and enhance your skills with CourseHub" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-r from-primary-600 to-primary-800 text-white py-20">
+      <section className="bg-gradient-to-r from-primary-600 to-primary-700 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl md:text-6xl font-bold mb-6">
-            Learn New Skills
-            <span className="block text-primary-200">Online with Top Educators</span>
+            Your Gateway to Knowledge
           </h1>
-          <p className="text-xl md:text-2xl text-primary-100 mb-8 max-w-3xl mx-auto">
-            Build skills with courses, certificates, and degrees online from world-class universities and companies.
+          <p className="text-xl md:text-2xl mb-8 text-primary-100">
+            Discover high-quality online courses and enhance your skills with expert instructors
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/courses" className="btn bg-white text-primary-600 hover:bg-gray-100 px-8 py-3 text-lg">
+            <Link 
+              href="/courses" 
+              className="btn-secondary px-8 py-3 text-lg font-semibold rounded-lg hover:bg-white hover:text-primary-600 transition-all duration-200"
+            >
               Browse Courses
             </Link>
-            <Link href="/register" className="btn btn-outline border-white text-white hover:bg-white hover:text-primary-600 px-8 py-3 text-lg">
+            <Link 
+              href="/register" 
+              className="bg-white text-primary-600 px-8 py-3 text-lg font-semibold rounded-lg hover:bg-gray-100 transition-all duration-200"
+            >
               Get Started
             </Link>
           </div>
         </div>
-        
-        {/* Decorative elements */}
-        <div className="absolute top-0 left-0 w-full h-full overflow-hidden">
-          <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary-500 rounded-full opacity-20"></div>
-          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-primary-400 rounded-full opacity-20"></div>
-        </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-16 bg-white">
+      {/* Features Section */}
+      <section className="py-20 bg-white dark:bg-gray-900 transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
-            <div>
-              <div className="text-3xl font-bold text-primary-600 mb-2">1000+</div>
-              <div className="text-gray-600">Online Courses</div>
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+              Why Choose CourseHub?
+            </h2>
+            <p className="text-xl text-gray-600 dark:text-gray-300">
+              We provide the best learning experience with our comprehensive features
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-primary-100 dark:bg-primary-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                Expert Content
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300">
+                Learn from industry experts with years of experience in their fields
+              </p>
             </div>
-            <div>
-              <div className="text-3xl font-bold text-primary-600 mb-2">500+</div>
-              <div className="text-gray-600">Expert Instructors</div>
+
+            <div className="text-center">
+              <div className="w-16 h-16 bg-primary-100 dark:bg-primary-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                Learn at Your Pace
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300">
+                Access courses anytime, anywhere with lifetime access to materials
+              </p>
             </div>
-            <div>
-              <div className="text-3xl font-bold text-primary-600 mb-2">50K+</div>
-              <div className="text-gray-600">Active Students</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold text-primary-600 mb-2">95%</div>
-              <div className="text-gray-600">Success Rate</div>
+
+            <div className="text-center">
+              <div className="w-16 h-16 bg-primary-100 dark:bg-primary-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                Certificate of Completion
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300">
+                Earn certificates to showcase your new skills and knowledge
+              </p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Featured Courses Section */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-20 bg-gray-50 dark:bg-gray-800 transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Featured Courses</h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Discover our most popular and highly-rated courses from top instructors
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+              Featured Courses
+            </h2>
+            <p className="text-xl text-gray-600 dark:text-gray-300">
+              Start your learning journey with our most popular courses
             </p>
           </div>
 
           {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className="card animate-pulse">
-                  <div className="h-48 bg-gray-300"></div>
-                  <div className="p-6">
-                    <div className="h-4 bg-gray-300 rounded mb-2"></div>
-                    <div className="h-3 bg-gray-300 rounded mb-4"></div>
-                    <div className="h-6 bg-gray-300 rounded w-20"></div>
-                  </div>
-                </div>
-              ))}
+            <div className="flex justify-center">
+              <div className="spinner w-8 h-8 border-2 rounded-full animate-spin"></div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {featuredCourses.map((course) => (
-                <div key={course._id} className="card hover:shadow-lg transition-shadow duration-300">
+                <div key={course._id} className="course-card rounded-xl overflow-hidden transition-all duration-200">
                   <div className="relative">
                     <img
-                      src={course.thumbnail || 'https://via.placeholder.com/400x250?text=Course+Image'}
+                      src={course.thumbnail || '/placeholder-course.jpg'}
                       alt={course.title}
                       className="w-full h-48 object-cover"
                     />
-                    <div className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
-                      <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center">
-                        <FiPlay className="w-8 h-8 text-primary-600 ml-1" />
-                      </div>
+                    <div className="absolute top-4 right-4">
+                      <span className="badge-primary px-3 py-1 rounded-full text-sm font-medium">
+                        ${course.price}
+                      </span>
                     </div>
                   </div>
-                  
                   <div className="p-6">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="badge badge-primary">{course.category}</span>
-                      <span className="badge badge-secondary">{course.level}</span>
-                    </div>
-                    
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                       {course.title}
                     </h3>
-                    
-                    <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                      {course.shortDescription}
+                    <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-2">
+                      {course.description}
                     </p>
-                    
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center space-x-4 text-sm text-gray-500">
-                        <div className="flex items-center space-x-1">
-                          <FiUsers className="w-4 h-4" />
-                          <span>{course.enrollmentCount || 0}</span>
-                        </div>
-                        <div className="flex items-center space-x-1">
-                          <FiClock className="w-4 h-4" />
-                          <span>{course.duration}</span>
-                        </div>
-                      </div>
-                      
-                      {course.rating && course.rating.average > 0 && (
-                        <div className="flex items-center space-x-1">
-                          <FiStar className="w-4 h-4 text-yellow-400 fill-current" />
-                          <span className="text-sm font-medium">{course.rating.average.toFixed(1)}</span>
-                        </div>
-                      )}
-                    </div>
-                    
                     <div className="flex items-center justify-between">
-                      <div className="text-2xl font-bold text-primary-600">
-                        ${course.price}
+                      <div className="flex items-center space-x-2">
+                        <span className="badge-secondary px-2 py-1 rounded text-xs">
+                          {course.level}
+                        </span>
+                        <span className="badge-secondary px-2 py-1 rounded text-xs">
+                          {course.category}
+                        </span>
                       </div>
                       <Link
                         href={`/courses/${course._id}`}
-                        className="btn btn-primary"
+                        className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium transition-colors duration-200"
                       >
-                        View Course
+                        Learn More →
                       </Link>
                     </div>
                   </div>
@@ -168,74 +179,33 @@ export default function Home() {
           )}
 
           <div className="text-center mt-12">
-            <Link href="/courses" className="btn btn-outline px-8 py-3 text-lg">
+            <Link
+              href="/courses"
+              className="btn-primary px-8 py-3 text-lg font-semibold rounded-lg transition-all duration-200"
+            >
               View All Courses
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Why Choose Us Section */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Why Choose CourseHub?</h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              We provide the best learning experience with our comprehensive platform
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <FiPlay className="w-8 h-8 text-primary-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Learn at Your Own Pace</h3>
-              <p className="text-gray-600">
-                Access course content anytime, anywhere. Learn at your own speed and convenience.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <FiUsers className="w-8 h-8 text-primary-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Expert Instructors</h3>
-              <p className="text-gray-600">
-                Learn from industry experts and professionals with years of experience.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <FiStar className="w-8 h-8 text-primary-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Quality Content</h3>
-              <p className="text-gray-600">
-                High-quality, up-to-date content that helps you stay ahead in your field.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* CTA Section */}
-      <section className="py-16 bg-gradient-to-r from-primary-600 to-primary-800 text-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold mb-4">Ready to Start Learning?</h2>
+      <section className="py-20 bg-primary-600 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            Ready to Start Learning?
+          </h2>
           <p className="text-xl text-primary-100 mb-8">
-            Join thousands of students who are already learning and growing with CourseHub
+            Join thousands of learners who have already transformed their careers
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/register" className="btn bg-white text-primary-600 hover:bg-gray-100 px-8 py-3 text-lg">
-              Get Started Today
-            </Link>
-            <Link href="/courses" className="btn btn-outline border-white text-white hover:bg-white hover:text-primary-600 px-8 py-3 text-lg">
-              Browse Courses
-            </Link>
-          </div>
+          <Link
+            href="/register"
+            className="bg-white text-primary-600 px-8 py-3 text-lg font-semibold rounded-lg hover:bg-gray-100 transition-all duration-200"
+          >
+            Get Started Today
+          </Link>
         </div>
       </section>
-    </Layout>
+    </div>
   );
 }

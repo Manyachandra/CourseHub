@@ -10,7 +10,11 @@
   }
   
   body {
-    @apply bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white transition-colors duration-200;
+    @apply bg-white text-gray-900 transition-colors duration-200;
+  }
+
+  body.dark {
+    @apply bg-gray-900 text-white;
   }
 }
 
@@ -20,23 +24,39 @@
   }
   
   .btn-primary {
-    @apply btn bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500;
+    @apply bg-primary-600 text-white hover:bg-primary-700 focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all duration-200;
   }
   
   .btn-secondary {
-    @apply btn bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-300 dark:hover:bg-gray-600 focus:ring-gray-500;
+    @apply bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200;
+  }
+
+  .dark .btn-secondary {
+    @apply bg-gray-700 text-white hover:bg-gray-600 focus:ring-gray-400;
   }
   
   .btn-outline {
-    @apply btn border-2 border-primary-600 text-primary-600 hover:bg-primary-600 hover:text-white dark:border-primary-400 dark:text-primary-400 dark:hover:bg-primary-500;
+    @apply border border-gray-300 text-gray-700 hover:bg-gray-50 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all duration-200;
+  }
+
+  .dark .btn-outline {
+    @apply border-gray-600 text-white hover:bg-gray-800 focus:ring-gray-400;
   }
   
   .input {
-    @apply w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400;
+    @apply w-full px-3 py-2 border border-gray-300 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200;
+  }
+
+  .dark .input {
+    @apply border-gray-600 bg-gray-800 text-white placeholder-gray-400 focus:ring-primary-400 focus:border-primary-400;
   }
   
   .card {
-    @apply bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden transition-colors duration-200;
+    @apply bg-white border border-gray-200 shadow-sm transition-all duration-200;
+  }
+
+  .dark .card {
+    @apply bg-gray-800 border-gray-700 shadow-lg;
   }
   
   .badge {
@@ -44,11 +64,19 @@
   }
   
   .badge-primary {
-    @apply badge bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200;
+    @apply bg-primary-100 text-primary-800;
+  }
+
+  .dark .badge-primary {
+    @apply bg-primary-900 text-primary-200;
   }
   
   .badge-secondary {
-    @apply badge bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200;
+    @apply bg-gray-100 text-gray-800;
+  }
+
+  .dark .badge-secondary {
+    @apply bg-gray-700 text-gray-200;
   }
 }
 
@@ -60,4 +88,218 @@
   .gradient-bg {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   }
+}
+
+/* Navigation styles */
+.nav-link {
+  @apply text-gray-600 hover:text-primary-600 transition-colors duration-200;
+}
+
+.dark .nav-link {
+  @apply text-gray-300 hover:text-primary-400;
+}
+
+.nav-link.active {
+  @apply text-primary-600;
+}
+
+.dark .nav-link.active {
+  @apply text-primary-400;
+}
+
+/* Footer styles */
+.footer {
+  @apply bg-gray-50 text-gray-600;
+}
+
+.dark .footer {
+  @apply bg-gray-800 text-gray-300;
+}
+
+/* Course card styles */
+.course-card {
+  @apply bg-white border border-gray-200 hover:shadow-lg transition-all duration-200;
+}
+
+.dark .course-card {
+  @apply bg-gray-800 border-gray-700 hover:shadow-xl;
+}
+
+/* Form styles */
+.form-label {
+  @apply text-gray-700 font-medium;
+}
+
+.dark .form-label {
+  @apply text-gray-200;
+}
+
+.form-error {
+  @apply text-red-600 text-sm;
+}
+
+.dark .form-error {
+  @apply text-red-400;
+}
+
+/* Table styles */
+.table-header {
+  @apply bg-gray-50 text-gray-700;
+}
+
+.dark .table-header {
+  @apply bg-gray-700 text-gray-200;
+}
+
+.table-row {
+  @apply border-b border-gray-200;
+}
+
+.dark .table-row {
+  @apply border-gray-700;
+}
+
+/* Modal styles */
+.modal-overlay {
+  @apply bg-black bg-opacity-50;
+}
+
+.modal-content {
+  @apply bg-white;
+}
+
+.dark .modal-content {
+  @apply bg-gray-800;
+}
+
+/* Dropdown styles */
+.dropdown-menu {
+  @apply bg-white border border-gray-200 shadow-lg;
+}
+
+.dark .dropdown-menu {
+  @apply bg-gray-800 border-gray-700 shadow-xl;
+}
+
+/* Alert styles */
+.alert-success {
+  @apply bg-green-50 text-green-800 border-green-200;
+}
+
+.dark .alert-success {
+  @apply bg-green-900 text-green-200 border-green-700;
+}
+
+.alert-error {
+  @apply bg-red-50 text-red-800 border-red-200;
+}
+
+.dark .alert-error {
+  @apply bg-red-900 text-red-200 border-red-700;
+}
+
+.alert-warning {
+  @apply bg-yellow-50 text-yellow-800 border-yellow-200;
+}
+
+.dark .alert-warning {
+  @apply bg-yellow-900 text-yellow-200 border-yellow-700;
+}
+
+.alert-info {
+  @apply bg-blue-50 text-blue-800 border-blue-200;
+}
+
+.dark .alert-info {
+  @apply bg-blue-900 text-blue-200 border-blue-700;
+}
+
+/* Sidebar styles */
+.sidebar {
+  @apply bg-white border-r border-gray-200;
+}
+
+.dark .sidebar {
+  @apply bg-gray-800 border-gray-700;
+}
+
+/* Breadcrumb styles */
+.breadcrumb {
+  @apply text-gray-500;
+}
+
+.dark .breadcrumb {
+  @apply text-gray-400;
+}
+
+.breadcrumb-active {
+  @apply text-gray-900;
+}
+
+.dark .breadcrumb-active {
+  @apply text-white;
+}
+
+/* Pagination styles */
+.pagination-item {
+  @apply text-gray-500 hover:text-gray-700 hover:bg-gray-50;
+}
+
+.dark .pagination-item {
+  @apply text-gray-400 hover:text-white hover:bg-gray-700;
+}
+
+.pagination-active {
+  @apply bg-primary-600 text-white;
+}
+
+.dark .pagination-active {
+  @apply bg-primary-500;
+}
+
+/* Tooltip styles */
+.tooltip {
+  @apply bg-gray-900 text-white;
+}
+
+.dark .tooltip {
+  @apply bg-gray-100 text-gray-900;
+}
+
+/* Loading spinner */
+.spinner {
+  @apply border-gray-300 border-t-primary-600;
+}
+
+.dark .spinner {
+  @apply border-gray-600 border-t-primary-400;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100;
+}
+
+.dark ::-webkit-scrollbar-track {
+  @apply bg-gray-800;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 rounded-full;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  @apply bg-gray-600;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-500;
 }

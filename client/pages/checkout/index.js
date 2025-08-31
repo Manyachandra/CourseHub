@@ -371,7 +371,7 @@ export default function Checkout() {
                     order={order}
                     onPaymentSuccess={(result) => {
                       setStep('confirmation');
-                      clearCart();
+                      // Cart will be cleared by PaymentForm component
                       toast.success('Payment processed successfully! Redirecting to My Courses...');
                       // Redirect to My Courses after a short delay
                       setTimeout(() => {

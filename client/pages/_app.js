@@ -1,27 +1,19 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { useUserStore, useThemeStore } from '../utils/store';
+import Layout from '../components/Layout';
 import '../styles/globals.css';
 
-function MyApp({ Component, pageProps }) {
-  const { checkAuth, setLoading } = useUserStore();
+export default function App({ Component, pageProps }) {
+  const { checkAuth } = useUserStore();
   const { theme, setTheme } = useThemeStore();
 
-  const initializeAuth = useCallback(async () => {
-    try {
-      setLoading(true);
-      await checkAuth();
-    } catch (error) {
-      console.error('Auth initialization error:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [checkAuth, setLoading]);
-
-  // Initialize theme on app load
   useEffect(() => {
+    // Initialize authentication
+    checkAuth();
+
+    // Initialize theme
     if (typeof window !== 'undefined') {
-      // Check for saved theme preference or default to light
       const savedTheme = localStorage.getItem('theme-storage');
       if (savedTheme) {
         try {
@@ -33,33 +25,34 @@ function MyApp({ Component, pageProps }) {
           console.error('Error parsing theme storage:', error);
         }
       } else {
-        // Check system preference
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        setTheme(prefersDark ? 'dark' : 'light');
+        // Check system preference if no saved theme
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        setTheme(systemPrefersDark ? 'dark' : 'light');
       }
     }
-  }, [setTheme]);
+  }, [checkAuth, setTheme]);
 
   useEffect(() => {
-    // Check if user is authenticated on app load
-    initializeAuth();
-  }, [initializeAuth]);
+    // Apply theme to document
+    if (typeof window !== 'undefined') {
+      document.documentElement.classList.toggle('dark', theme === 'dark');
+    }
+  }, [theme]);
 
   return (
-    <>
+    <Layout>
       <Component {...pageProps} />
       <Toaster
         position="top-right"
         toastOptions={{
           duration: 4000,
           style: {
-            background: theme === 'dark' ? '#1f2937' : '#363636',
-            color: '#fff',
+            background: theme === 'dark' ? '#1f2937' : '#ffffff',
+            color: theme === 'dark' ? '#ffffff' : '#1f2937',
+            border: theme === 'dark' ? '1px solid #374151' : '1px solid #e5e7eb',
           },
         }}
       />
-    </>
+    </Layout>
   );
 }
-
-export default MyApp;

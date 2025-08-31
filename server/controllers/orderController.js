@@ -91,19 +91,30 @@ const getOrderById = async (req, res) => {
 // Get user's orders
 const getUserOrders = async (req, res) => {
   try {
+    console.log('Getting orders for user:', req.user.id);
+    
     const user = await User.findById(req.user.id);
     if (!user) {
+      console.log('User not found:', req.user.id);
       return res.status(404).json({ message: 'User not found' });
     }
 
+    console.log('User found, searching for orders...');
+    
     const orders = await Order.find({ user: req.user.id })
       .populate('courses.courseId', 'title price thumbnail instructor')
       .sort({ createdAt: -1 });
 
+    console.log('Found orders:', orders.length);
+    
     res.json({ orders });
   } catch (error) {
     console.error('Get user orders error:', error);
-    res.status(500).json({ message: 'Server error while fetching orders' });
+    console.error('Error stack:', error.stack);
+    res.status(500).json({ 
+      message: 'Server error while fetching orders',
+      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+    });
   }
 };
 
@@ -171,6 +182,8 @@ const processPayment = async (req, res) => {
     const { orderId } = req.params;
     const { paymentMethod, paymentDetails } = req.body;
 
+    console.log('Processing payment for order:', orderId);
+
     const order = await Order.findById(orderId);
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
@@ -193,6 +206,7 @@ const processPayment = async (req, res) => {
     };
 
     await order.save();
+    console.log('Order updated successfully');
 
     // Add courses to user's purchased courses
     const user = await User.findById(req.user.id);
@@ -203,15 +217,23 @@ const processPayment = async (req, res) => {
       });
     });
 
+    // Clear user's cart after successful payment
+    user.cart = [];
     await user.save();
+    console.log('User cart cleared and courses added to purchased courses');
 
     res.json({
       message: 'Payment processed successfully',
-      order
+      order,
+      cartCleared: true
     });
   } catch (error) {
     console.error('Process payment error:', error);
-    res.status(500).json({ message: 'Server error while processing payment' });
+    console.error('Error stack:', error.stack);
+    res.status(500).json({ 
+      message: 'Server error while processing payment',
+      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+    });
   }
 };
 

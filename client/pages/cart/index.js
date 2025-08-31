@@ -1,289 +1,233 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
+import Head from 'next/head';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
-import Layout from '../../components/Layout';
-import { cartAPI } from '../../utils/api';
 import { useCartStore } from '../../utils/store';
-import { FiTrash2, FiShoppingCart, FiArrowRight, FiX } from 'react-icons/fi';
+import { useThemeStore } from '../../utils/store';
 import toast from 'react-hot-toast';
 
 export default function Cart() {
   const router = useRouter();
-  const { items, setItems, setTotal, removeItem, clearCart } = useCartStore();
-  const [loading, setLoading] = useState(true);
-  const [updating, setUpdating] = useState(false);
+  const { cartItems, removeFromCart, updateQuantity, clearCart } = useCartStore();
+  const { theme } = useThemeStore();
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    fetchCart();
-  }, []);
-
-  const fetchCart = async () => {
-    try {
-      setLoading(true);
-      const response = await cartAPI.get();
-      setItems(response.data.cart);
-      
-      const totalResponse = await cartAPI.getTotal();
-      setTotal(totalResponse.data.total);
-    } catch (error) {
-      console.error('Error fetching cart:', error);
-      toast.error('Error loading cart');
-    } finally {
-      setLoading(false);
-    }
+  const calculateTotal = () => {
+    return cartItems.reduce((total, item) => total + (item.courseId.price * item.quantity), 0);
   };
 
-  const handleRemoveItem = async (courseId) => {
-    try {
-      setUpdating(true);
-      await cartAPI.remove(courseId);
-      removeItem(courseId);
-      
-      // Recalculate total
-      const totalResponse = await cartAPI.getTotal();
-      setTotal(totalResponse.data.total);
-      
-      toast.success('Course removed from cart');
-    } catch (error) {
-      console.error('Error removing item:', error);
-      toast.error('Error removing course from cart');
-    } finally {
-      setUpdating(false);
-    }
+  const handleQuantityChange = (itemId, newQuantity) => {
+    if (newQuantity < 1) return;
+    updateQuantity(itemId, newQuantity);
   };
 
-  const handleClearCart = async () => {
-    try {
-      setUpdating(true);
-      await cartAPI.clear();
-      clearCart();
-      toast.success('Cart cleared successfully');
-    } catch (error) {
-      console.error('Error clearing cart:', error);
-      toast.error('Error clearing cart');
-    } finally {
-      setUpdating(false);
-    }
+  const handleRemoveItem = (itemId) => {
+    removeFromCart(itemId);
+    toast.success('Item removed from cart');
+  };
+
+  const handleClearCart = () => {
+    clearCart();
+    toast.success('Cart cleared');
   };
 
   const handleCheckout = () => {
-    if (items.length === 0) {
+    if (cartItems.length === 0) {
       toast.error('Your cart is empty');
       return;
     }
     router.push('/checkout');
   };
 
-  const handleContinueShopping = () => {
-    router.push('/courses');
-  };
-
-  if (loading) {
+  if (cartItems.length === 0) {
     return (
-      <Layout>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-300 rounded w-1/3 mb-8"></div>
-            <div className="space-y-4">
-              {[...Array(3)].map((_, i) => (
-                <div key={i} className="card p-6">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-24 h-24 bg-gray-300 rounded"></div>
-                    <div className="flex-1 space-y-2">
-                      <div className="h-4 bg-gray-300 rounded w-3/4"></div>
-                      <div className="h-3 bg-gray-300 rounded w-1/2"></div>
-                      <div className="h-6 bg-gray-300 rounded w-20"></div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+      <div className={`min-h-screen transition-colors duration-200 ${theme === 'dark' ? 'dark' : ''}`}>
+        <Head>
+          <title>Shopping Cart - CourseHub</title>
+          <meta name="description" content="Your shopping cart on CourseHub" />
+        </Head>
+
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+          <div className="text-gray-400 dark:text-gray-500 mb-8">
+            <svg className="w-24 h-24 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m6 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01" />
+            </svg>
           </div>
+          
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+            Your cart is empty
+          </h1>
+          
+          <p className="text-xl text-gray-600 dark:text-gray-300 mb-8">
+            Looks like you haven't added any courses to your cart yet.
+          </p>
+          
+          <Link
+            href="/courses"
+            className="btn-primary px-8 py-3 text-lg font-semibold rounded-lg transition-all duration-200"
+          >
+            Browse Courses
+          </Link>
         </div>
-      </Layout>
+      </div>
     );
   }
 
   return (
-    <Layout>
+    <div className={`min-h-screen transition-colors duration-200 ${theme === 'dark' ? 'dark' : ''}`}>
+      <Head>
+        <title>Shopping Cart - CourseHub</title>
+        <meta name="description" content="Your shopping cart on CourseHub" />
+      </Head>
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Shopping Cart</h1>
-          <p className="text-gray-600">
-            {items.length === 0 ? 'Your cart is empty' : `${items.length} course${items.length !== 1 ? 's' : ''} in your cart`}
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            Shopping Cart
+          </h1>
+          <p className="text-gray-600 dark:text-gray-300">
+            {cartItems.length} {cartItems.length === 1 ? 'course' : 'courses'} in your cart
           </p>
         </div>
 
-        {items.length === 0 ? (
-          /* Empty Cart */
-          <div className="text-center py-16">
-            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <FiShoppingCart className="w-12 h-12 text-gray-400" />
-            </div>
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">Your cart is empty</h2>
-            <p className="text-gray-600 mb-8 max-w-md mx-auto">
-              Looks like you haven't added any courses to your cart yet. Start exploring our course catalog!
-            </p>
-            <button
-              onClick={handleContinueShopping}
-              className="btn btn-primary px-8 py-3 text-lg"
-            >
-              Browse Courses
-            </button>
-          </div>
-        ) : (
-          /* Cart Items */
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Cart Items List */}
-            <div className="lg:col-span-2">
-              <div className="card">
-                <div className="p-6 border-b border-gray-200">
-                  <div className="flex items-center justify-between">
-                    <h2 className="text-lg font-semibold text-gray-900">Cart Items</h2>
-                    <button
-                      onClick={handleClearCart}
-                      disabled={updating}
-                      className="text-sm text-red-600 hover:text-red-700 disabled:opacity-50"
-                    >
-                      {updating ? 'Clearing...' : 'Clear Cart'}
-                    </button>
-                  </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Cart Items */}
+          <div className="lg:col-span-2">
+            <div className="card">
+              <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    Cart Items
+                  </h2>
+                  <button
+                    onClick={handleClearCart}
+                    className="text-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors duration-200"
+                  >
+                    Clear Cart
+                  </button>
                 </div>
+              </div>
 
-                <div className="divide-y divide-gray-200">
-                  {items.map((item) => (
-                    <div key={item.courseId._id} className="p-6">
-                      <div className="flex items-start space-x-4">
-                        {/* Course Image */}
-                        <div className="flex-shrink-0">
-                          <img
-                            src={item.courseId.thumbnail || 'https://via.placeholder.com/120x80?text=Course'}
-                            alt={item.courseId.title}
-                            className="w-24 h-20 object-cover rounded-lg"
-                          />
-                        </div>
+              <div className="divide-y divide-gray-200 dark:divide-gray-700">
+                {cartItems.map((item) => (
+                  <div key={item.id} className="p-6">
+                    <div className="flex items-start space-x-4">
+                      {/* Course Image */}
+                      <div className="flex-shrink-0">
+                        <img
+                          src={item.courseId.thumbnail || '/placeholder-course.jpg'}
+                          alt={item.courseId.title}
+                          className="w-24 h-24 object-cover rounded-lg"
+                        />
+                      </div>
 
-                        {/* Course Details */}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              <h3 className="text-lg font-medium text-gray-900 mb-1">
-                                {item.courseId.title}
-                              </h3>
-                              <p className="text-sm text-gray-600 mb-2 line-clamp-2">
-                                {item.courseId.shortDescription}
-                              </p>
-                              <div className="flex items-center space-x-4 text-sm text-gray-500">
-                                <span className="flex items-center space-x-1">
-                                  <FiShoppingCart className="w-4 h-4" />
-                                  <span>Added {new Date(item.addedAt).toLocaleDateString()}</span>
-                                </span>
-                              </div>
-                            </div>
-
-                            {/* Price and Actions */}
-                            <div className="flex flex-col items-end space-y-3">
-                              <div className="text-right">
-                                <div className="text-2xl font-bold text-primary-600">
-                                  ${item.courseId.price}
-                                </div>
-                                {item.courseId.originalPrice && item.courseId.originalPrice > item.courseId.price && (
-                                  <div className="text-sm text-gray-500 line-through">
-                                    ${item.courseId.originalPrice}
-                                  </div>
-                                )}
-                              </div>
-
+                      {/* Course Details */}
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                          {item.courseId.title}
+                        </h3>
+                        <p className="text-gray-600 dark:text-gray-300 text-sm mb-2">
+                          {item.courseId.category} • {item.courseId.level}
+                        </p>
+                        <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-2">
+                          {item.courseId.description}
+                        </p>
+                        
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-4">
+                            {/* Quantity Controls */}
+                            <div className="flex items-center space-x-2">
                               <button
-                                onClick={() => handleRemoveItem(item.courseId._id)}
-                                disabled={updating}
-                                className="text-red-600 hover:text-red-700 disabled:opacity-50 p-2 rounded-lg hover:bg-red-50 transition-colors"
-                                title="Remove from cart"
+                                onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
+                                className="w-8 h-8 rounded-full border border-gray-300 dark:border-gray-600 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
                               >
-                                <FiTrash2 className="w-5 h-5" />
+                                -
+                              </button>
+                              <span className="w-8 text-center text-gray-900 dark:text-white font-medium">
+                                {item.quantity}
+                              </span>
+                              <button
+                                onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
+                                className="w-8 h-8 rounded-full border border-gray-300 dark:border-gray-600 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+                              >
+                                +
                               </button>
                             </div>
+
+                            {/* Price */}
+                            <div className="text-lg font-semibold text-primary-600 dark:text-primary-400">
+                              ${(item.courseId.price * item.quantity).toFixed(2)}
+                            </div>
                           </div>
+
+                          {/* Remove Button */}
+                          <button
+                            onClick={() => handleRemoveItem(item.id)}
+                            className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors duration-200"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                          </button>
                         </div>
                       </div>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
               </div>
             </div>
+          </div>
 
-            {/* Cart Summary */}
-            <div className="lg:col-span-1">
-              <div className="card p-6 sticky top-8">
-                <h2 className="text-lg font-semibold text-gray-900 mb-6">Order Summary</h2>
+          {/* Order Summary */}
+          <div className="lg:col-span-1">
+            <div className="card sticky top-8">
+              <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Order Summary
+                </h2>
+              </div>
 
-                {/* Summary Details */}
-                <div className="space-y-4 mb-6">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Subtotal ({items.length} course{items.length !== 1 ? 's' : ''})</span>
-                    <span className="font-medium">
-                      ${items.reduce((sum, item) => sum + item.courseId.price, 0).toFixed(2)}
-                    </span>
-                  </div>
-                  
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Tax</span>
-                    <span className="font-medium">$0.00</span>
-                  </div>
-                  
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Total</span>
-                    <span className="text-lg font-bold text-primary-600">
-                      ${items.reduce((sum, item) => sum + item.courseId.price, 0).toFixed(2)}
-                    </span>
-                  </div>
+              <div className="p-6 space-y-4">
+                {/* Subtotal */}
+                <div className="flex justify-between text-gray-600 dark:text-gray-300">
+                  <span>Subtotal ({cartItems.length} {cartItems.length === 1 ? 'course' : 'courses'})</span>
+                  <span>${calculateTotal().toFixed(2)}</span>
+                </div>
+
+                {/* Tax */}
+                <div className="flex justify-between text-gray-600 dark:text-gray-300">
+                  <span>Tax</span>
+                  <span>$0.00</span>
+                </div>
+
+                {/* Total */}
+                <div className="flex justify-between text-lg font-semibold text-gray-900 dark:text-white pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <span>Total</span>
+                  <span>${calculateTotal().toFixed(2)}</span>
                 </div>
 
                 {/* Checkout Button */}
                 <button
                   onClick={handleCheckout}
-                  disabled={updating || items.length === 0}
-                  className="w-full btn btn-primary py-3 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={loading || cartItems.length === 0}
+                  className="btn-primary w-full py-3 text-lg font-semibold rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <span>Proceed to Checkout</span>
-                  <FiArrowRight className="w-5 h-5 ml-2" />
+                  {loading ? 'Processing...' : 'Proceed to Checkout'}
                 </button>
 
                 {/* Continue Shopping */}
-                <button
-                  onClick={handleContinueShopping}
-                  className="w-full btn btn-outline mt-3 py-3"
+                <Link
+                  href="/courses"
+                  className="btn-outline w-full py-3 text-center block transition-all duration-200"
                 >
                   Continue Shopping
-                </button>
-
-                {/* Additional Info */}
-                <div className="mt-6 pt-6 border-t border-gray-200">
-                  <h3 className="font-medium text-gray-900 mb-3">What's included:</h3>
-                  <ul className="space-y-2 text-sm text-gray-600">
-                    <li className="flex items-center space-x-2">
-                      <FiX className="w-4 h-4 text-green-500" />
-                      <span>Full lifetime access</span>
-                    </li>
-                    <li className="flex items-center space-x-2">
-                      <FiX className="w-4 h-4 text-green-500" />
-                      <span>Access on mobile and TV</span>
-                    </li>
-                    <li className="flex items-center space-x-2">
-                      <FiX className="w-4 h-4 text-green-500" />
-                      <span>Certificate of completion</span>
-                    </li>
-                    <li className="flex items-center space-x-2">
-                      <FiX className="w-4 h-4 text-green-500" />
-                      <span>30-day money-back guarantee</span>
-                    </li>
-                  </ul>
-                </div>
+                </Link>
               </div>
             </div>
           </div>
-        )}
+        </div>
       </div>
-    </Layout>
+    </div>
   );
 }
