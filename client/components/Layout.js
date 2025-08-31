@@ -1,8 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useUserStore, useCartStore, useUIStore } from '../utils/store';
-import { authAPI } from '../utils/api';
 import { FiMenu, FiX, FiShoppingCart, FiUser, FiLogOut } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
@@ -20,11 +19,11 @@ const Layout = ({ children }) => {
   const handleLogout = async () => {
     try {
       setIsLoggingOut(true);
-      await authAPI.logout();
-      logoutUser();
+      await logoutUser(); // Use the store's logout method
       toast.success('Logged out successfully');
       router.push('/');
     } catch (error) {
+      console.error('Logout error:', error);
       toast.error('Error logging out');
     } finally {
       setIsLoggingOut(false);
