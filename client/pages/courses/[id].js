@@ -70,7 +70,7 @@ export default function CourseDetails() {
       toast.success('Course added to cart!');
     } catch (error) {
       console.error('Error adding to cart:', error);
-      if (error.message === 'Course already purchased') {
+      if (error.message === 'You already own this course') {
         toast.error('Already purchased! You already own this course.');
       } else {
         toast.error('Error adding to cart');
