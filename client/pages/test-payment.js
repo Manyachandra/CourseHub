@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import { paymentAPI } from '../utils/api';
 import { FiCreditCard, FiPaypal, FiBank, FiCheckCircle, FiXCircle, FiRefreshCw } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import Layout from '../components/Layout';
@@ -16,11 +17,8 @@ export default function TestPayment() {
 
   const fetchPaymentMethods = async () => {
     try {
-      const response = await fetch('/api/payments/methods', {
-        credentials: 'include'
-      });
-      const data = await response.json();
-      setPaymentMethods(data.paymentMethods);
+      const response = await paymentAPI.getMethods();
+      setPaymentMethods(response.data.paymentMethods);
     } catch (error) {
       console.error('Failed to fetch payment methods:', error);
     }
@@ -30,21 +28,14 @@ export default function TestPayment() {
     setLoading(true);
     
     try {
-      const response = await fetch('/api/payments/test', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          amount: Math.floor(Math.random() * 100) + 10,
-          currency: 'USD',
-          paymentMethod: method,
-          testMode: true
-        })
+      const response = await paymentAPI.test({
+        amount: Math.floor(Math.random() * 100) + 10,
+        currency: 'USD',
+        paymentMethod: method,
+        testMode: true
       });
 
-      const result = await response.json();
+      const result = response.data;
       
       const testResult = {
         id: Date.now(),
