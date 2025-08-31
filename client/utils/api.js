@@ -1,5 +1,6 @@
 import axios from 'axios';
 
+// Use environment variable for API URL
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
 
 // Debug logging
@@ -35,14 +36,22 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor
+// Response interceptor with better error handling
 api.interceptors.response.use(
   (response) => {
     return response;
   },
   (error) => {
-    // Don't automatically redirect on 401 errors to prevent redirect loops
-    // Let individual components handle authentication errors
+    // Handle authentication errors specifically
+    if (error.response?.status === 401) {
+      console.error('Authentication failed:', error.response.data);
+      // Clear any stored user data on authentication failure
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('user-storage');
+        // Optionally redirect to login
+        // window.location.href = '/login';
+      }
+    }
     return Promise.reject(error);
   }
 );
