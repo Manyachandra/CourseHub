@@ -1,4 +1,4 @@
-# CourseHub - Online Course Purchase Website
+# CourseHub
 
 A fully functional course purchase website built with Node.js, Express, Next.js, and MongoDB. This platform allows users to browse courses, add them to cart, complete purchases, and manage their learning journey.
 
@@ -53,7 +53,7 @@ A fully functional course purchase website built with Node.js, Express, Next.js,
 ## 📁 Project Structure
 
 ```
-Course-App/
+CourseHub/
 ├── server/                 # Backend server
 │   ├── config/            # Database configuration
 │   ├── controllers/       # Route controllers
@@ -81,8 +81,8 @@ Course-App/
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
-   cd Course-App
+   git clone https://github.com/Manyachandra/CourseHub.git
+   cd CourseHub
    ```
 
 2. **Install backend dependencies**
@@ -98,37 +98,37 @@ Course-App/
    ```
 
 4. **Environment Setup**
-   
-   Create a `.env` file in the server directory:
+
+   Create a `.env` file in the `server` directory:
    ```env
    PORT=5000
    MONGODB_URI=mongodb://localhost:27017/course_website
-   SESSION_SECRET=your_session_secret_here
-   STRIPE_SECRET_KEY=your_stripe_secret_key
-   STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key
-   EMAIL_USER=your_email@gmail.com
-   EMAIL_PASS=your_email_password
+   SESSION_SECRET=replace-with-a-strong-random-string
+   STRIPE_SECRET_KEY=sk_test_xxx
+   STRIPE_PUBLISHABLE_KEY=pk_test_xxx
+   EMAIL_USER=your-email@example.com
+   EMAIL_PASS=your-mail-password
    EMAIL_SERVICE=gmail
    ```
 
 5. **Database Setup**
-   
+
    Ensure MongoDB is running and create a database named `course_website`
 
 6. **Start the application**
-   
+
    **Option 1: Run both servers simultaneously**
    ```bash
    # From the root directory
    npm run dev
    ```
-   
+
    **Option 2: Run servers separately**
    ```bash
    # Terminal 1 - Backend
    cd server
    npm run dev
-   
+
    # Terminal 2 - Frontend
    cd client
    npm run dev
