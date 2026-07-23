@@ -78,3 +78,7 @@ test-results/
 
 # Vercel / deployment
 .vercel/
+
+# Python
+__pycache__/
+.venv/
