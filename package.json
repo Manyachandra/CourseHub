@@ -1,7 +1,7 @@
 {
   "name": "coursehub-website",
   "version": "1.0.0",
-  "description": "A fully functional course purchase website with Node.js, Next.js, and Express",
+  "description": "CourseHub \u2014 fully functional course purchase website with Node.js, Express, Next.js, and MongoDB.",
   "main": "server/index.js",
   "scripts": {
     "dev": "concurrently \"npm run server\" \"npm run client\"",
@@ -30,5 +30,13 @@
   "engines": {
     "node": ">=14.0.0",
     "npm": ">=6.0.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Manyachandra/CourseHub.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Manyachandra/CourseHub/issues"
+  },
+  "homepage": "https://github.com/Manyachandra/CourseHub#readme"
 }

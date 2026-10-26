@@ -8,7 +8,8 @@ const isAuthenticated = (req, res, next) => {
       return res.status(401).json({ message: 'Authentication required' });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-jwt-secret');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    // JWT_SECRET must be set; verify throws if missing/weak
     req.user = decoded;
     next();
   } catch (error) {
@@ -25,7 +26,8 @@ const isAdmin = (req, res, next) => {
       return res.status(401).json({ message: 'Authentication required' });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-jwt-secret');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    // JWT_SECRET must be set; verify throws if missing/weak
     
     if (decoded.role !== 'admin') {
       return res.status(403).json({ message: 'Admin access required' });
@@ -44,7 +46,8 @@ const isNotAuthenticated = (req, res, next) => {
     const token = req.headers.authorization?.split(' ')[1];
     
     if (token) {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-jwt-secret');
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    // JWT_SECRET must be set; verify throws if missing/weak
       if (decoded) {
         return res.status(400).json({ message: 'Already authenticated' });
       }

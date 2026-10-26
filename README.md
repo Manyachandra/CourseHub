@@ -1,5 +1,8 @@
 # CourseHub
 
+[CourseHub](https://github.com/Manyachandra/CourseHub)
+
+
 A fully functional course purchase website built with Node.js, Express, Next.js, and MongoDB. This platform allows users to browse courses, add them to cart, complete purchases, and manage their learning journey.
 
 ## 🚀 Features
